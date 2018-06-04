@@ -15,4 +15,3 @@ ebt_mds_full <-
            parse_factor(levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"), ordered = TRUE)) %>% 
   replace_na(replace = list("Count" = 0L, Value = 0L, Hits = 0L)) %>% 
   select(Date, Day, Count, Value, Hits, nLoc, Loc)
-
