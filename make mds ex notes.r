@@ -4,7 +4,7 @@ library(lubridate)
 # Zahlensystem der Pseudonyme
 c("i", "j", "l", "o", "q", "s", "z") %>% # ohne diese Buchstaben
   setdiff(letters, .) %>%
-  c(1:9, ., toupper(.)) %>% # Gültig sind 1:9 und die nicht ausgeschlossenen Buchstaben sowohl klein als auch groß
+  c(1:9, ., toupper(.)) %>% # GÃ¼ltig sind 1:9 und die nicht ausgeschlossenen Buchstaben sowohl klein als auch groÃŸ
   factor(x = ., levels = .) %>% # fixiere Reihenfolge, da 'crossing' sortiert
   crossing(., ., .) %>%
   apply(., 1, paste, collapse = "") -> he
@@ -24,7 +24,7 @@ pseudo <- notes %>%
 ebt_mds <- notes %>%
   mutate(Date = DateStamp %>% date(),
          Coords = paste(Long, Lat, sep = "~")) %>% 
-  left_join(pseudo, by = "Coords") %>% # Anfügen der Pseudonyme
+  left_join(pseudo, by = "Coords") %>% # AnfÃ¼gen der Pseudonyme
   group_by(Date) %>%
   summarise(Count = n(),
             Value = sum(Value),
@@ -36,15 +36,8 @@ ebt_mds <- notes %>%
             by = c("Date" = "Date")) %>% 
   arrange(Date)
 
-ebt_mds_seven <- ebt_mds %>% tail(7)
-
 # Schreiben 'ebt_mds' gesamt
-dump("ebt_mds", "ebt_mds.txt")
-#write_csv(ebt_mds, "ebt_mds.csv")
+dump("ebt_mds")
 
-# Schreiben der letzten sieben Einträge plus Länge 
-dump("ebt_mds_seven", file = "ebt_mds_seven.txt")
-write(paste0("\n",dim(ebt_mds)[1]), file = "ebt_mds_seven.txt", append = TRUE)
-
-rm(he, pseudo, ebt_mds, ebt_mds_seven)
+rm(he, pseudo, ebt_mds)
 
