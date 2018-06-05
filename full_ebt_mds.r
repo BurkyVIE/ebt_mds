@@ -3,7 +3,7 @@ library(magrittr)
 library(lubridate)
 
 # Einlesen des minimal Dataset
-source("H:/00_Burkhardt/DT/ebt_mds.txt")
+source("ebt_mds.txt")
 
 ebt_mds_full <-
   ebt_mds$Date %>%
