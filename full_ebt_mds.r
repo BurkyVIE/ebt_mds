@@ -10,8 +10,10 @@ ebt_mds_full <-
   full_seq(1) %>%
   tibble(Date = .) %>%
   left_join(ebt_mds, by = "Date") %>%
-  mutate(nLoc = map(Loc, length) %>% unlist(),
+  mutate(Avg = Value / Count,
+         HitRt = Count / Hits,
+         nLoc = map(Loc, length) %>% unlist(),
          Day = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")[wday(Date, week_start = 1)] %>%
            parse_factor(levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"), ordered = TRUE)) %>% 
   replace_na(replace = list("Count" = 0L, Value = 0L, Hits = 0L)) %>% 
-  select(Date, Day, Count, Value, Hits, nLoc, Loc)
+  select(Date, Day, Count, Value, Avg, Hits, HitRt, nLoc, Loc)
