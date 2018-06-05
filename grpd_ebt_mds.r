@@ -20,6 +20,7 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
               Period = floor_date(Date, unit = period, week_start = 1)) %>%
     # Zusammenführen mit den mds-Daten und Zusammenfassen
     left_join(ebt_mds, "Date") %>%
+    replace_na(replace = list("Count" = 0L, Value = 0L, Hits = 0L)) %>%
     group_by(Period) %>% 
     summarise(Count = sum(Count, na.rm = TRUE),
               Value = sum(Value, na.rm = TRUE),
