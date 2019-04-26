@@ -31,14 +31,15 @@ ebt_mds <- notes %>%
             #Value = sum(Value),
             Loc = Loc %>% unique() %>% list()) %>% 
   full_join(hits %>%
-              mutate(Date = DateStamp %>% date()) %>% 
+              #mutate(Date = DateStamp %>% date()) %>% 
+              mutate(Date = DateStamp %>% date()) %>% # ab Version 1_1
               group_by(Date) %>% 
               summarise(Hits = n()),
             by = c("Date" = "Date")) %>% 
   arrange(Date) %>% 
   replace_na(replace = list(Hits = 0))
 
-ebt_mds_seven <- ebt_mds %>% tail(7)
+ebt_mds_seven <- ebt_mds %>% tail(11)
 
 # Schreiben 'ebt_mds' gesamt
 dump("ebt_mds", "ebt_mds.txt")
@@ -48,6 +49,7 @@ dump("ebt_mds", "ebt_mds.txt")
 dump("ebt_mds_seven", file = "ebt_mds_seven.txt")
 write(paste0("\n",dim(ebt_mds)[1]), file = "ebt_mds_seven.txt", append = TRUE)
 
-#Schreiben der Pseudonyme
 dump("pseudo", file = "pseudo.txt")
+
 rm(he, ebt_mds_seven)
+
