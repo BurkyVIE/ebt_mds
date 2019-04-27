@@ -32,7 +32,7 @@ ebt_mds <- notes %>%
             Loc = Loc %>% unique() %>% list()) %>% 
   full_join(hits %>%
               #mutate(Date = DateStamp %>% date()) %>% 
-              mutate(Date = DateStamp %>% date()) %>% # ab Version 1_1
+              mutate(Date = DateFixed %>% date()) %>% # ab Version 1_1
               group_by(Date) %>% 
               summarise(Hits = n()),
             by = c("Date" = "Date")) %>% 
