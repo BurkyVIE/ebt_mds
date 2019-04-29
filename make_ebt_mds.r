@@ -26,9 +26,7 @@ ebt_mds <- notes %>%
          Coords = paste(Long, Lat, sep = "~")) %>% 
   left_join(pseudo, by = "Coords") %>% # Anfügen der Pseudonyme
   group_by(Date) %>%
-  summarise(#Count = n(),
-            Deno = factor(Value, levels = c(5, 10, 20, 50, 100, 200 ,500)) %>% table() %>% as.double() %>% list(), # NEU
-            #Value = sum(Value),
+  summarise(Deno = factor(Value, levels = c(5, 10, 20, 50, 100, 200 ,500)) %>% table() %>% as.double() %>% list(),
             Loc = Loc %>% unique() %>% list()) %>% 
   full_join(hits %>%
               #mutate(Date = DateStamp %>% date()) %>% 
