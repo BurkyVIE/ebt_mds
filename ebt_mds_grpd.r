@@ -21,7 +21,8 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
               Hits = sum(Hits, na.rm = TRUE),
               nLoc = Loc %>% unlist() %>% unique() %>% length()) %>%
     mutate(Avg = Value / Count,
-           HitRt = Count / Hits) %>% 
-    select(Period, Days, Count, Value, Avg, Hits, HitRt, nLoc) %>% 
+           HitRt = Count / Hits,
+           LocRt = nLoc / Days) %>% 
+    select(Period, Days, Count, Value, Avg, Hits, HitRt, nLoc, LocRt) %>% 
     return()
   }
