@@ -11,7 +11,6 @@ ebt_mds_full <-
          Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
          Hits = as.integer(Hits),
          nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
-  #replace_na(replace = list(Count = 0L, Value = 0L, Hits = 0L)) %>% 
   select(Date, Day, Deno, Count, Value, Hits, Loc, nLoc)
 # Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
 levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
