@@ -8,7 +8,7 @@ ebt_mds_full <-
   tibble(Date = .) %>%                # in einen Tibble umwandeln ...
   left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
   mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE),
-         Deno = purrr::map(.x = Deno, .f = ~ if(is.null(.)) integer(7) else as.integer(.)), # ersetze die aus dem Joinen (auch schon bei der Erstellung) entstandenen NULL
+         Deno = purrr::map(.x = Deno, .f = ~ if(is.null(.)) integer(7) else as.integer(.)), # ersetze die aus dem Joinen entstandenen NULL
          Count = map_int(.x = Deno, .f = ~ sum(.)),
          Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
          Hits = as.integer(Hits),
