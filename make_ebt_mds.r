@@ -61,4 +61,4 @@ write(paste0("\n",dim(ebt_mds)[1]), file = "ebt_mds_seven.txt", append = TRUE)
 
 dump("pseudo", file = "pseudo.txt")
 
-rm(he, ebt_mds_seven)
+rm(vals2denocens, he, ebt_mds_seven)
