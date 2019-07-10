@@ -4,8 +4,6 @@ library(lubridate)
 # Funktion um aus den Werten (Value) einen Vektor der pro Denominatione eingegebenen Scheine zu machen,
 # abgeschnitten wird beim höchsten eingegebenen Wert (i.e. Länge nicht immer 7 - keine NUller am Ende)
 vals2denocens <- function(vals) {
-  if(is.null(vals)) return(0) #No Entries at all
-  
   vals <- factor(vals, levels = c(5, 10, 20, 50, 100, 200, 500)) %>% table() %>% as.double()
   while(length(vals) > 1) {
     if(tail(vals, 1) == 0) vals <- head(vals, -1) else return(vals)
