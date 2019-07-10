@@ -18,13 +18,35 @@ ebt_mds_full <-
 # Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
 levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
+         
 
+# Kennzahlen
+library(tidyverse)
+ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)) %>%
+  bind_cols(
+    ebt_mds %>% summarise_at(.vars = "Date", .funs = ~ full_seq(., 1) %>% length()),
+    ebt_mds %>% summarise_at(.vars = "Loc", .funs = ~ unlist(.) %>% unique() %>% length())
+  ) %>%
+  select(Days = Date, Count, Value, Hits, Loc) %>% 
+  print()
+
+         
 
 ### Expandieren der Denos
-ebt_mds_full %>% 
-  bind_cols(
-    ebt_mds_full$Deno %>%
-      do.call(rbind, .) %>%
-      as_tibble(.name_repair = "minimal") %>%
-      setNames(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))
-  )
+#ebt_mds_full %>% 
+#  bind_cols(
+#    ebt_mds_full$Deno %>%
+#      do.call(rbind, .) %>%
+#      as_tibble(.name_repair = "minimal") %>%
+#      setNames(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))
+#  )
+
+         
+         
+### Wo war ich am
+# pseudo %>%
+#   filter(Loc %in% (ebt_mds_full %>%
+#            filter(Date %in% lubridate::make_date(year = 2004:2019, month = 3, day = 21)) %>%
+#            pull(Loc) %>% unlist() %>% unique())) %>%
+#   select(Coords, Country:City) %>%
+#   arrange(Country, ZIP)
