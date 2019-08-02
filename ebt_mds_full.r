@@ -5,12 +5,17 @@ source("ebt_mds_grpd.r") # Funktion zum Gruppieren
 
 ebt_mds_full <-
   ebt_mds_grpd(per = "day") %>% 
-  rename(Date = Period)
+  rename(Date = Period, Day = Days) %>% # Da jeweils nur ein Tag Datum stat Periode und Wochentag statt Anzahl Tage
+  mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
+# Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
+
+
 
 # Kennzahlen
 library(tidyverse)
 bind_cols(
-  ebt_mds_full %>% summarise_at(.vars = vars(Days, Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)),
+  ebt_mds_full %>% summarise(Days = n()),
+  ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)),
   ebt_mds_full %>% summarise(nLoc = map_int(.x = list(Reduce(union, Loc)), .f = ~ length(.)))
 ) %>%
   print()
