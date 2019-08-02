@@ -11,8 +11,12 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
   if(!period %in% period_list) period <- period_list[menu(period_list, title = "choose periode")]
   if(identical(period, character(0))) return(NULL)
   
-  # Erstelle volleständige Liste der möglichen Daten und ergänze Periode
-  mds_data %>%
+  # Erstelle vollständige Liste der möglichen Daten
+  ebt_mds$Date %>%                      # aus den Eingabezeitpunkten ...
+    full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
+    tibble(Date = .) %>%                # in einen Tibble umwandeln ...
+    left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+    # Ergänze Periode
     mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>%
     group_by(Period) %>% 
     summarise(Days = n(),
