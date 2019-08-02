@@ -17,7 +17,8 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
     tibble(Date = .) %>%                # in einen Tibble umwandeln ...
     left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
     # Ergänze Periode
-    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>%
+#    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>% # Führt leider zu ungewohnten Effekten in GRafiken
+    mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>%
     group_by(Period) %>% 
     summarise(Days = n(),
               Deno = list(Reduce(`+`, Deno)),
