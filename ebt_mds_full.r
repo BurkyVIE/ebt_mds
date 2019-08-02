@@ -22,12 +22,11 @@ levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 # Kennzahlen
 library(tidyverse)
-ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)) %>%
   bind_cols(
-    ebt_mds %>% summarise_at(.vars = "Date", .funs = ~ full_seq(., 1) %>% length()),
-    ebt_mds %>% summarise_at(.vars = "Loc", .funs = ~ unlist(.) %>% unique() %>% length())
+    ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)),
+    ebt_mds_full %>% summarise(Days = full_seq(Date, 1) %>% length()),
+    ebt_mds_full %>% summarise(nLoc = map_int(.x = list(Reduce(union, Loc)), .f = ~ length(.)))
   ) %>%
-  select(Days = Date, Count, Value, Hits, Loc) %>% 
   print()
 
          
