@@ -16,14 +16,15 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
     mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>%
     group_by(Period) %>% 
     summarise(Days = n(),
+              Deno = list(Reduce(`+`, Deno)),
               Count = sum(Count, na.rm = TRUE),
               Value = sum(Value, na.rm = TRUE),
               Hits = sum(Hits, na.rm = TRUE),
-              nLoc = Loc %>% unlist() %>% unique() %>% length()) %>%
-    mutate(EntRt = Count / Days,
+              Loc = list(Reduce(union, Loc)),
+              nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
+  mutate(EntRt = Count / Days,
            Avg = Value / Count,
            HitRt = Count / Hits,
            LocRt = nLoc / Days) %>% 
-    select(Period, Days, Count, EntRt, Value, Avg, Hits, HitRt, nLoc, LocRt) %>% 
     return()
   }
