@@ -1,4 +1,4 @@
-source("ebt_mds_full.r")
+source("ebt_mds.txt")
 
 ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
 
@@ -12,10 +12,10 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
   if(identical(period, character(0))) return(NULL)
   
   # Erstelle vollständige Liste der möglichen Daten
-  ebt_mds$Date %>%                      # aus den Eingabezeitpunkten ...
+  mds_data$Date %>%                      # aus den Eingabezeitpunkten ...
     full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     tibble(Date = .) %>%                # in einen Tibble umwandeln ...
-    left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+    left_join(mds_data, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
     # Ergänze Periode
 #    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>% # Führt leider zu ungewohnten Effekten in GRafiken
     mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>%
