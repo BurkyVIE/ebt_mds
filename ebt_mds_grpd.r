@@ -1,6 +1,4 @@
-source("ebt_mds.txt")
-
-ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
+ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
 
   # Notwendige libraries
   library(tidyverse)
@@ -12,10 +10,14 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
   if(identical(period, character(0))) return(NULL)
   
   # Erstelle vollständige Liste der möglichen Daten
-  mds_data$Date %>%                      # aus den Eingabezeitpunkten ...
+  ebt_mds$Date %>%                      # aus den Eingabezeitpunkten ...
     full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     tibble(Date = .) %>%                # in einen Tibble umwandeln ...
-    left_join(mds_data, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+    left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+    # Fülle Deno auf und ergänze Count und Value
+    mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
+           Count = map_int(.x = Deno, .f = ~ sum(.)),
+           Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer())) %>% 
     # Ergänze Periode
 #    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>% # Führt leider zu ungewohnten Effekten in GRafiken
     mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>%
@@ -27,7 +29,7 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds_full) {
               Hits = sum(Hits, na.rm = TRUE),
               Loc = list(Reduce(union, Loc)),
               nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
-  mutate(EntRt = Count / Days,
+    mutate(EntRt = Count / Days,
            Avg = Value / Count,
            HitRt = Count / Hits,
            LocRt = nLoc / Days) %>% 
