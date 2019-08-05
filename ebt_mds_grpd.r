@@ -24,10 +24,10 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
     group_by(Period) %>% 
     summarise(Days = n(),
               Deno = list(Reduce(`+`, Deno)),
+              Loc = list(Reduce(union, Loc)),
               Count = sum(Count, na.rm = TRUE),
               Value = sum(Value, na.rm = TRUE),
               Hits = sum(Hits, na.rm = TRUE),
-              Loc = list(Reduce(union, Loc)),
               nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
     mutate(EntRt = Count / Days,
            Avg = Value / Count,
