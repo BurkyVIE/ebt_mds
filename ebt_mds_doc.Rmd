@@ -160,7 +160,7 @@ plot(p)
 ```
 
 ###Denomination
-Distribution of entered bills by denomination:
+Distribution of daily entered bills by denomination:
 ```{r denomination, echo=FALSE}
 
 ebt_mds_full$Deno %>%
