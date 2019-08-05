@@ -14,10 +14,8 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
     full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     tibble(Date = .) %>%                # in einen Tibble umwandeln ...
     left_join(mds_data, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
-    # Fülle Deno auf und ergänze Count und Value
-    mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
-           Count = map_int(.x = Deno, .f = ~ sum(.)),
-           Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer())) %>% 
+    # Fülle Deno auf 7 Stellen auf
+    mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x))))) %>% 
     # Ergänze Periode
 #    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>% # Führt leider zu ungewohnten Effekten in GRafiken
     mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>%
@@ -25,10 +23,11 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
     summarise(Days = n(),
               Deno = list(Reduce(`+`, Deno)),
               Loc = list(Reduce(union, Loc)),
-              Count = sum(Count, na.rm = TRUE),
-              Value = sum(Value, na.rm = TRUE),
+              Count = map_int(.x = Deno, .f = ~ sum(.)),
+              Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
               Hits = sum(Hits, na.rm = TRUE),
               nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
+    # Weitere Ableitungen
     mutate(EntRt = Count / Days,
            Avg = Value / Count,
            HitRt = Count / Hits,
