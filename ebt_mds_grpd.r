@@ -18,8 +18,7 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
     mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
            Hits = as.integer(Hits)) %>% 
     # Ergänze Periode
-#    mutate(Period = ceiling_date(Date, unit = period, week_start = 1) - days(1)) %>% # Führt leider zu ungewohnten Effekten in GRafiken
-    mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>%
+    mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>% # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
     group_by(Period) %>% 
     # Zusammenfassen entsprechend Periode
     summarise(Deno = list(Reduce(`+`, Deno)),
@@ -34,5 +33,7 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days) %>% 
+    # Umkehren der Reihenfolge (kein tail erforderlich um letzte zu sehen)
+    arrange(desc(Period)) %>% 
     return()
   }
