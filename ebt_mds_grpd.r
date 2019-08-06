@@ -1,8 +1,5 @@
 ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
 
-  # Einlesen des minimal Dataset
-  source("ebt_mds.txt")
-  
   # Notwendige libraries
   library(tidyverse)
   library(lubridate)
@@ -13,10 +10,10 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
   if(identical(period, character(0))) return(NULL)
   
   # Erstelle vollständige Liste der möglichen Daten
-  mds_data$Date %>%                      # aus den Eingabezeitpunkten ...
-    full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
-    enframe(name = NULL) %>%                # in einen Tibble umwandeln ...
-    left_join(mds_data, by = c("value" = "Date")) %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+  mds_data$Date %>%                          # aus den Eingabezeitpunkten ...
+    full_seq(1) %>%                          # einen Vektor aller möglichen Zeitpunkte erzeugen ...
+    enframe(name = NULL, value = "Date") %>% # in einen Tibble umwandeln ...
+    left_join(mds_data, "Date") %>%          # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf
     mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x))))) %>% 
     # Ergänze Periode
