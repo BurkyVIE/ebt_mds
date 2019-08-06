@@ -1,7 +1,8 @@
-source("ebt_mds.txt") # Einlesen des minimal Dataset
-
 ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
 
+  # Einlesen des minimal Dataset
+  source("ebt_mds.txt")
+  
   # Notwendige libraries
   library(tidyverse)
   library(lubridate)
