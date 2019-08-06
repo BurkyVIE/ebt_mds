@@ -1,5 +1,6 @@
 library(tidyverse)
 
+source("ebt_mds.txt") # Einlesen des minimal Dataset
 source("ebt_mds_grpd.r") # Funktion zum Gruppieren
 
 ebt_mds_full <-
@@ -13,8 +14,8 @@ ebt_mds_full <-
 # Kennzahlen
 library(tidyverse)
 bind_cols(
+  ebt_mds_full %>% summarise_at(.vars = vars(Hits, Count, Value), .funs = ~sum(., na.rm = TRUE)),
   ebt_mds_full %>% summarise(Days = n()),
-  ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .funs = ~sum(., na.rm = TRUE)),
   ebt_mds_full %>% summarise(nLoc = map_int(.x = list(Reduce(union, Loc)), .f = ~ length(.)))
 ) %>%
   print()
