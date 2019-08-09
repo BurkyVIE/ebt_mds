@@ -16,16 +16,24 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
     left_join(mds_data, by = "Date") %>%     # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
     mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
-           Hits = as.integer(Hits)) %>% 
+           Hits = as.integer(Hits)) -> tmp
+  # Wenn tageweise Gruppierung, dann keine gruppieren notwendig
+  if(period != "day") {
+    cat("IF TRUE!")
     # Ergänze Periode
-    mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>% # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
-    group_by(Period) %>% 
-    # Zusammenfassen entsprechend Periode
-    summarise(Deno = list(Reduce(`+`, Deno)),
-              Loc = list(Reduce(union, Loc)),
-              Days = n(),
-              Hits = sum(Hits, na.rm = TRUE)) %>%
-    # Diverse Ableitungen
+    tmp <- tmp %>% 
+      mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>% # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
+      group_by(Period) %>% 
+      # Zusammenfassen entsprechend Periode
+      summarise(Deno = list(Reduce(`+`, Deno)),
+                Loc = list(Reduce(union, Loc)),
+                Days = n(),
+                Hits = sum(Hits, na.rm = TRUE))
+    } else
+      # Wenn nicht gruppiert wird, dennoch Days = 1 und Date in Period umbenennen
+      tmp <- tmp %>% mutate(Days = 1) %>% select(Date, Deno, Loc, Days, Hits) %>% rename(Period = Date)
+  # Diverse Ableitungen
+  tmp %>% 
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
            Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
