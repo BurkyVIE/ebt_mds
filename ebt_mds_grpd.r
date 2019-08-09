@@ -5,7 +5,7 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
   library(lubridate)
   
   # Auswahl der Periode 
-  period_list = c("day", "week", "month", "3 month", "6 month", "year")
+  period_list = c("day", "week", "month", "3 month", "6 month", "year", "3 year")
   if(!period %in% period_list) period <- period_list[menu(period_list, title = "choose periode")]
   if(identical(period, character(0))) return(NULL)
   
@@ -19,7 +19,6 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
            Hits = as.integer(Hits)) -> tmp
   # Wenn tageweise Gruppierung, dann keine gruppieren notwendig
   if(period != "day") {
-    cat("IF TRUE!")
     # Ergänze Periode
     tmp <- tmp %>% 
       mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>% # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
