@@ -1,6 +1,7 @@
 library(tidyverse)
 
-ebt_grpd <- ebt_mds_grpd(period = "month") # Daten für den Plot
+ebt_grpd <- ebt_mds_grpd(period = "month") %>%  # Daten für den Plot
+  arrange(Period)                               # Last is last
 
 p <- ebt_grpd  %>%
   mutate_at(vars(Count, Value, Hits), .funs = ~(. / Days)) %>% # Berechnungen für pro Tag
