@@ -13,13 +13,29 @@ ebt_mds_full <-
 
 
 # Kennzahlen
-library(tidyverse)
+download.file("https://de.eurobilltracker.com/profile/?user=32954", "EBT.html")
+tmp <-
+  read_file("EBT.html") %>% 
+  gsub("<span style=\"font-size: 7px; line-height: normal\">&nbsp;</span>", "", .) %>% 
+  sub(".*Interessante Treffer: ([0-9]+).*Eingegebene Geldscheine: ([0-9]+).*Gesamtwert der eingegebenen Scheine: ([0-9]+).*",
+       "\\1, \\2, \\3", .) %>% 
+  strsplit(., split = ", ") %>% 
+  unlist() %>% 
+  as.integer()
+tmp <- 
+  tibble(Where = "Net", Hits = tmp[1], Count = tmp[2], Value = tmp[3])
+file.remove("EBT.html")
+
 bind_cols(
+  Where = "Local",
   ebt_mds_full %>% summarise_at(.vars = vars(Hits, Count, Value), .funs = ~sum(., na.rm = TRUE)),
   ebt_mds_full %>% summarise(Days = n()),
   ebt_mds_full %>% summarise(nLoc = map_int(.x = list(Reduce(union, Loc)), .f = ~ length(.)))
 ) %>%
+  bind_rows(., tmp) %>% 
   print()
+
+rm(tmp)
 
 
 
