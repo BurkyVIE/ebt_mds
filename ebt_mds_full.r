@@ -26,14 +26,17 @@ tmp <-
   tibble(Where = "Net", Hits = tmp[1], Count = tmp[2], Value = tmp[3])
 file.remove("EBT.html")
 
-bind_cols(
+tmp <- bind_cols(
   Where = "Local",
   ebt_mds_full %>% summarise_at(.vars = vars(Hits, Count, Value), .funs = ~sum(., na.rm = TRUE)),
   ebt_mds_full %>% summarise(Days = n()),
   ebt_mds_full %>% summarise(nLoc = map_int(.x = list(Reduce(union, Loc)), .f = ~ length(.)))
 ) %>%
-  bind_rows(., tmp) %>% 
-  print()
+  bind_rows(., tmp)
+
+print(list(Summary = tmp,
+           Check = identical(tmp[1, 2:4], tmp[2, 2:4]))
+      )
 
 rm(tmp)
 
