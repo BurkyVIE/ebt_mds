@@ -1,4 +1,4 @@
-ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
 
   # Notwendige libraries
   library(tidyverse)
@@ -27,20 +27,24 @@ ebt_mds_grpd <- function(period = FALSE, mds_data = ebt_mds) {
       summarise(Deno = list(Reduce(`+`, Deno)),
                 Loc = list(Reduce(union, Loc)),
                 Days = n(),
-                Hits = sum(Hits, na.rm = TRUE))
+                Hits = sum(Hits, na.rm = TRUE),
+                .groups = "drop")
     } else
       # Wenn nicht gruppiert wird, dennoch Days = 1 und Date in Period umbenennen
-      tmp <- tmp %>% mutate(Days = 1) %>% select(Date, Deno, Loc, Days, Hits) %>% rename(Period = Date)
+      tmp <- tmp %>%
+        mutate(Days = 1) %>% select(Date, Deno, Loc, Days, Hits) %>% rename(Period = Date)
   # Diverse Ableitungen
-  tmp %>% 
+  tmp <- tmp %>% 
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
            Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
            Avg = Value / Count,
            HitRt = Count / Hits,
            EntRt = Count / Days,
-           LocRt = nLoc / Days) %>% 
-    # Umkehren der Reihenfolge (kein tail erforderlich um letzte zu sehen)
-    arrange(desc(Period)) %>% 
-    return()
+           LocRt = nLoc / Days)
+  # Umkehren der Reihenfolge (letzte oben)
+  if(invert) tmp <- tmp %>%
+    arrange(desc(Period))
+  # Rückgabe
+  return(tmp)
   }
