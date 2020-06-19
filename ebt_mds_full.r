@@ -4,7 +4,7 @@ source("ebt_mds.txt") # Einlesen des minimal Dataset
 source("ebt_mds_grpd.r") # Funktion zum Gruppieren
 
 ebt_mds_full <-
-  ebt_mds_grpd(per = "day") %>% 
+  ebt_mds_grpd(per = "day", invert = TRUE) %>% 
   rename(Date = Period, Day = Days) %>% # Da jeweils nur ein Tag Datum stat Periode und Wochentag statt Anzahl Tage
   select(-EntRt, -LocRt) %>% # Beide Ableitungen entstehen durch Division durch 1
   mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
