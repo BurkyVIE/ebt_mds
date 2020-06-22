@@ -32,15 +32,15 @@ levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 rm(ebt_mds)
 ```
 
-###General
+### General
 ```{r general, include=FALSE}
 
 days <- tibble (total = ebt_mds_full %>% nrow(),
                 bills = ebt_mds_full %>% filter(Count >0 ) %>% nrow(),
                 hits = ebt_mds_full %>% filter(Hits >0 ) %>% nrow())
-stat <- ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .f = ~ sum(., na.rm = TRUE)) %>%
+stat <- ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .f = ~ sum(., na.rm = TRUE), .groups = "drop") %>%
   bind_cols(
-    ebt_mds_full %>% summarise_at(.vars = "Loc", .f = ~ unlist(.) %>% unique() %>% length())
+    ebt_mds_full %>% summarise_at(.vars = "Loc", .f = ~ unlist(.) %>% unique() %>% length(), .groups = "drop")
   )
 ```
 Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occured on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).  
@@ -48,7 +48,7 @@ Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** betw
 **`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occured (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).  
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
-###Active Periods
+### Active Periods
 The five longest active periods were:
 ```{r periods, echo=FALSE}
 
@@ -61,14 +61,15 @@ ebt_mds_full %>%
                rep(1:length(.), .)) %>% 
   group_by(Type) %>% 
   summarise(From = first(Date),
-            Till = last(Date),
+            To = last(Date),
             Days = n(),
             Bills = sum(Count),
             Value = sum(Value),
             Hits = sum(Hits),
             BpD = (Bills / Days) %>% round(1),
             Avg = (Value / Bills) %>% round(2),
-            HitRt = (Bills / Hits) %>% round(2)) %>% 
+            HitRt = (Bills / Hits) %>% round(2),
+            .groups = "drop") %>% 
   mutate(Type = rep(c("Active", "Inactive"), length.out = nrow(.))) %>% 
   arrange(desc(Days)) %>%
   filter(Type == "Active") %>% 
@@ -80,20 +81,21 @@ ebt_mds_full %>%
 
 The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
 
-###Monthly Activity
+### Monthly Activity
 The five most active months were:
 ```{r months, echo=FALSE}
 
 ebt_mds_full %>%
   # Zusammenfassen der Daten pro Monat
-  group_by(Month = ceiling_date(Date, unit = "month")-days(1)) %>% 
+  group_by(Month = floor_date(Date, unit = "month") %>% str_sub(1, 7)) %>% 
   summarise(Days = n(),
             Bills = sum(Count, na.rm = TRUE),
             Value = sum(Value, na.rm = TRUE),
             Hits = sum(Hits, na.rm = TRUE),
             BpD = (Bills / Days) %>% round(1),
             Avg = (Value / Bills) %>% round(2),
-            HitRt = (Bills / Hits) %>% round(2)) %>% 
+            HitRt = (Bills / Hits) %>% round(2),
+            .groups = "drop") %>% 
   arrange(desc(BpD)) -> tmp
   knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
 
@@ -117,7 +119,8 @@ ebt_grpd <- ebt_mds_full %>%
             Count = sum(Count, na.rm = TRUE),
             Value = sum(Value, na.rm = TRUE),
             Hits = sum(Hits, na.rm = TRUE),
-            Loc = Loc %>% unlist() %>% unique() %>% length())
+            Loc = Loc %>% unlist() %>% unique() %>% length(),
+            .groups = "drop")
 
 # Korrigieren der Daten mit den Tagen, abgeleitete Variablen und Farben aktuelle Periode
 p_dat <- ebt_grpd  %>%
@@ -134,9 +137,9 @@ p_dat <- ebt_grpd  %>%
 # Definieren des Plots
 p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) + 
   geom_point(mapping = aes(color = Color), shape = 4, size = 0.8, alpha = 0.65, show.legend = FALSE) +
-  geom_smooth(color = colors[6], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
+  geom_smooth(color = colors[2], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
   scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
-  scale_color_manual(values = c("old" = colors[1], "recent" = colors[3])) +
+  scale_color_manual(values = c("old" = colors[5], "recent" = colors[7])) +
   labs(x = "Time", y = "") +
   facet_wrap(~ What, scales = "free_y", ncol = 2) +
   theme_bw()
@@ -145,13 +148,14 @@ p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) +
 plot(p)
 ```
 
-Distribution of number of Bills entered:
+Distribution of monthly number of Bills entered:
 
 ```{r month4, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
 
 p <- ebt_grpd %>% 
   ggplot(mapping = aes(x = Count)) +
-  geom_histogram(color = colors[1], fill = colors[6], binwidth = 500) +
+  geom_histogram(color = "white", fill = colors[5], binwidth = 750) +
+  geom_freqpoly(binwidth = 750, color = colors[2], size = 1.1, linetype = "longdash") +
   labs(x = "Bills", y = "Count") +
   theme_bw()
 
@@ -159,8 +163,8 @@ p <- ebt_grpd %>%
 plot(p)
 ```
 
-###Denomination
-Distribution of daily entered bills by denomination:
+### Denomination
+Distribution of entered bills by denomination:
 ```{r denomination, echo=FALSE}
 
 ebt_mds_full$Deno %>%
@@ -169,7 +173,7 @@ ebt_mds_full$Deno %>%
   setNames(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .))) %>% 
   gather(key = Denomination, value = Count) %>% 
   group_by(Denomination) %>% 
-  summarise(Count = sum(Count)) %>% 
+  summarise(Count = sum(Count), .groups = "drop") %>% 
   mutate(Val = substr(Denomination, 2, 4) %>% as.integer(),
          Denomination = factor(Denomination, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
                                  stringr::str_pad(., width = 3, side = "left") %>% 
@@ -194,7 +198,7 @@ ebt_mds_full %>%
       setNames(., paste0("€ ", c(5, 10, 20, 50, 100, 200, 500)))
   ) %>% 
   group_by(Year = lubridate::year(Date)) %>% 
-  summarise_at(.vars = vars(`€ 5`:`€ 500`), .f = ~ sum(.)) %>% 
+  summarise_at(.vars = vars(`€ 5`:`€ 500`), .f = ~ sum(.), .groups = "drop") %>% 
   gather(-Year, key = Denomination, value = Count) %>% 
   mutate(Denomination = factor(Denomination, levels = paste0("€ ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp
 
@@ -207,3 +211,4 @@ p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denomination)
 plot(p)
 
 ```
+
