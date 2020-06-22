@@ -1,0 +1,214 @@
+---
+title: "EuroBillTracker"
+author: "Burky"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(lubridate)
+
+colors <- viridis::viridis(7, begin = 0, end = .9)
+
+source("ebt_mds.txt")
+ebt_mds_full <-
+  ebt_mds$Date %>%                    # aus den Eingabezeitpunkten ...
+  full_seq(1) %>%                     # einen Vektor aller möglichen Zeitpunkte erzeugen ...
+  tibble(Date = .) %>%                # in einen Tibble umwandeln ...
+  left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
+  mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE),
+         Deno = purrr::map(.x = Deno, .f = function(x = .) c(x, double(7 - length(x))) %>% as.integer()),
+         Count = map_int(.x = Deno, .f = ~ sum(.)),
+         Value = map_dbl(.x = Deno, .f = ~ (t(.) %*% c(5L, 10L, 20L, 50L, 100L, 200L, 500L)) %>% as.integer()),
+         nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
+  select(Date, Day, Deno, Count, Value, Hits, Loc, nLoc)
+# Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
+levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+rm(ebt_mds)
+```
+
+### General
+```{r general, include=FALSE}
+
+days <- tibble (total = ebt_mds_full %>% nrow(),
+                bills = ebt_mds_full %>% filter(Count >0 ) %>% nrow(),
+                hits = ebt_mds_full %>% filter(Hits >0 ) %>% nrow())
+stat <- ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .f = ~ sum(., na.rm = TRUE), .groups = "drop") %>%
+  bind_cols(
+    ebt_mds_full %>% summarise_at(.vars = "Loc", .f = ~ unlist(.) %>% unique() %>% length(), .groups = "drop")
+  )
+```
+Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occured on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).  
+**`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`).  
+**`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occured (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).  
+Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
+
+### Active Periods
+The five longest active periods were:
+```{r periods, echo=FALSE}
+
+ebt_mds_full %>%
+  add_column(Type = (ebt_mds_full$Count > 0) %>%
+               rle %>%
+               `[`(1) %>%
+               unlist() %>%
+               as.numeric() %>%
+               rep(1:length(.), .)) %>% 
+  group_by(Type) %>% 
+  summarise(From = first(Date),
+            To = last(Date),
+            Days = n(),
+            Bills = sum(Count),
+            Value = sum(Value),
+            Hits = sum(Hits),
+            BpD = (Bills / Days) %>% round(1),
+            Avg = (Value / Bills) %>% round(2),
+            HitRt = (Bills / Hits) %>% round(2),
+            .groups = "drop") %>% 
+  mutate(Type = rep(c("Active", "Inactive"), length.out = nrow(.))) %>% 
+  arrange(desc(Days)) %>%
+  filter(Type == "Active") %>% 
+  select(-Type) %>% 
+  head(5) -> tmp
+  knitr::kable(tmp, format.args = list(big.mark = ','))
+
+```
+
+The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
+
+### Monthly Activity
+The five most active months were:
+```{r months, echo=FALSE}
+
+ebt_mds_full %>%
+  # Zusammenfassen der Daten pro Monat
+  group_by(Month = floor_date(Date, unit = "month") %>% str_sub(1, 7)) %>% 
+  summarise(Days = n(),
+            Bills = sum(Count, na.rm = TRUE),
+            Value = sum(Value, na.rm = TRUE),
+            Hits = sum(Hits, na.rm = TRUE),
+            BpD = (Bills / Days) %>% round(1),
+            Avg = (Value / Bills) %>% round(2),
+            HitRt = (Bills / Hits) %>% round(2),
+            .groups = "drop") %>% 
+  arrange(desc(BpD)) -> tmp
+  knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
+
+```
+
+The three least active months were:
+```{r months2, echo=FALSE}
+
+knitr::kable(tail(tmp, 3), format.args = list(big.mark = ','))
+
+```
+
+Graphical representation of the monthly variation:
+
+```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+
+ebt_grpd <- ebt_mds_full %>%
+  # Zusammenfassen der Daten pro Monat
+  group_by(Month = ceiling_date(Date, unit = "month") - days(1)) %>% 
+  summarise(Days = n(),
+            Count = sum(Count, na.rm = TRUE),
+            Value = sum(Value, na.rm = TRUE),
+            Hits = sum(Hits, na.rm = TRUE),
+            Loc = Loc %>% unlist() %>% unique() %>% length(),
+            .groups = "drop")
+
+# Korrigieren der Daten mit den Tagen, abgeleitete Variablen und Farben aktuelle Periode
+p_dat <- ebt_grpd  %>%
+  mutate(AvgValue = Value / Count,
+         HitRt = Count / Hits,
+         Color = c(rep("old", n() - 1), "recent")) %>% 
+  mutate_at(vars(Count, Value, Hits), .f = ~ (. / Days)) %>% 
+  # Überführen der Spalten in eine Variable
+  gather(-Month, -Days, -Color, key = "What", value = "Count") %>%
+  # Festlegen der Reihenfolge der Plots
+  mutate(What = What %>%
+           factor(levels = c("Count", "Value", "AvgValue", "Hits", "HitRt", "Loc"),
+                  labels = c("Bills per Day", "Value per Day", "Avg Value", "Hits per Day", "Hit-Ratio (1 : ..)", "Locations")))
+# Definieren des Plots
+p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) + 
+  geom_point(mapping = aes(color = Color), shape = 4, size = 0.8, alpha = 0.65, show.legend = FALSE) +
+  geom_smooth(color = colors[2], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+  scale_color_manual(values = c("old" = colors[5], "recent" = colors[7])) +
+  labs(x = "Time", y = "") +
+  facet_wrap(~ What, scales = "free_y", ncol = 2) +
+  theme_bw()
+
+# Plot
+plot(p)
+```
+
+Distribution of monthly number of Bills entered:
+
+```{r month4, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+
+p <- ebt_grpd %>% 
+  ggplot(mapping = aes(x = Count)) +
+  geom_histogram(color = "white", fill = colors[5], binwidth = 750) +
+  geom_freqpoly(binwidth = 750, color = colors[2], size = 1.1, linetype = "longdash") +
+  labs(x = "Bills", y = "Count") +
+  theme_bw()
+
+# Plot
+plot(p)
+```
+
+### Denomination
+Distribution of entered bills by denomination:
+```{r denomination, echo=FALSE}
+
+ebt_mds_full$Deno %>%
+  do.call(rbind, .) %>%
+  as_tibble(.name_repair = "minimal") %>%
+  setNames(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .))) %>% 
+  gather(key = Denomination, value = Count) %>% 
+  group_by(Denomination) %>% 
+  summarise(Count = sum(Count), .groups = "drop") %>% 
+  mutate(Val = substr(Denomination, 2, 4) %>% as.integer(),
+         Denomination = factor(Denomination, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
+                                 stringr::str_pad(., width = 3, side = "left") %>% 
+                                 paste0("€ ", .)),
+         Value = Count * Val,
+         C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
+         V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
+  select(Denomination, Count, C_Pct, Value, V_Pct) -> tmp
+  knitr::kable(tmp, format.args = list(big.mark = ','))
+
+```
+
+Denominations by year:
+
+```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+
+ebt_mds_full %>% 
+  bind_cols(
+    ebt_mds_full$Deno %>%
+      do.call(rbind, .) %>%
+      as_tibble(.name_repair = "minimal") %>%
+      setNames(., paste0("€ ", c(5, 10, 20, 50, 100, 200, 500)))
+  ) %>% 
+  group_by(Year = lubridate::year(Date)) %>% 
+  summarise_at(.vars = vars(`€ 5`:`€ 500`), .f = ~ sum(.), .groups = "drop") %>% 
+  gather(-Year, key = Denomination, value = Count) %>% 
+  mutate(Denomination = factor(Denomination, levels = paste0("€ ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp
+
+p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denomination)) +
+  geom_bar(mapping = aes(fill = Denomination), stat = "identity") +
+  scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000) +
+  scale_fill_viridis_d(direction = -1, begin = .15, end = .85) +
+  theme_bw()
+
+plot(p)
+
+```
+
