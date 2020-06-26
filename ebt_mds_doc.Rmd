@@ -47,9 +47,9 @@ EuroBillTracker (EBT) is an international non-profit volunteer team dedicated to
 days <- tibble (total = ebt_mds_full %>% nrow(),
                 bills = ebt_mds_full %>% filter(Count >0 ) %>% nrow(),
                 hits = ebt_mds_full %>% filter(Hits >0 ) %>% nrow())
-stat <- ebt_mds_full %>% summarise_at(.vars = vars(Count, Value, Hits), .f = ~ sum(., na.rm = TRUE), .groups = "drop") %>%
+stat <- ebt_mds_full %>% summarise(across(.cols = Count:Hits, .fns = ~ sum(., na.rm = TRUE)), .groups = "drop") %>%
   bind_cols(
-    ebt_mds_full %>% summarise_at(.vars = "Loc", .f = ~ unlist(.) %>% unique() %>% length(), .groups = "drop")
+    ebt_mds_full %>% summarise(across(.cols = Loc, .fns = ~ unlist(.) %>% n_distinct()), .groups = "drop")
   )
 ```
 Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occured on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).  
