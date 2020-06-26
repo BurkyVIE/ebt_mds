@@ -1,5 +1,6 @@
 ---
 title: "EuroBillTracker"
+subtitle: "https://www.eurobilltracker.com"
 author: "Burky"
 output:
   word_document: default
@@ -32,7 +33,15 @@ levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 rm(ebt_mds)
 ```
 
-### General
+# About
+EuroBillTracker (EBT) is an international non-profit volunteer team dedicated to tracking Euro notes around the world. Each user enters the serial numbers and location information for each note they obtain into EuroBillTracker. From this information, the site extracts:
+
+* Diffusion information: Each Euro country has its own range of note serial numbers and from this information we can generate diffusion graphs that tell us how the notes travel to other countries. See the Diffusion section for more information.
+* Tracking information: When a note is re-entered, the users who previously entered it are notified via email. These hits can be seen in the statistics section.
+* Statistics and rankings: Who enters the most notes, which are the best countries? Where are the notes currently situated?
+
+# User Burky
+## General
 ```{r general, include=FALSE}
 
 days <- tibble (total = ebt_mds_full %>% nrow(),
@@ -48,7 +57,8 @@ Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** betw
 **`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occured (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).  
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
-### Active Periods
+\pagebreak
+## Active Periods
 The five longest active periods were:
 ```{r periods, echo=FALSE}
 
@@ -81,8 +91,7 @@ ebt_mds_full %>%
 
 The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
 
-\pagebreak
-### Yearly Activity
+## Yearly Activity
 Entries throughout the year:
 
 ```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
@@ -113,7 +122,7 @@ rm(top, p)
 ```
 
 \pagebreak
-### Monthly Activity
+## Monthly Activity
 The five most active months were:
 ```{r months, echo=FALSE}
 
@@ -181,7 +190,7 @@ plot(p)
 ```
 
 \pagebreak
-### Denomination
+## Denomination
 Distribution of entered bills by denomination:
 ```{r denomination, echo=FALSE}
 
