@@ -37,7 +37,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
   tmp <- tmp %>% 
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
            Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
-           nLoc = map_int(.x = Loc, .f = ~ length(.)),
+           nLoc = map_int(.x = Loc, .f = ~ n_distinct(.)),
            Avg = Value / Count,
            HitRt = Count / Hits,
            EntRt = Count / Days,
