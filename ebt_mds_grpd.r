@@ -5,7 +5,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
   library(lubridate)
   
   # Auswahl der Periode 
-  period_list = c("overall", "day", "week", "month", "quarter", "halfyear", "year")
+  period_list = c("overall", "day", "week", "month", "quarter", "halfyear", "year", "10 years")
   if(!period %in% period_list) period <- period_list[menu(period_list, title = "choose periode")]
   if(identical(period, character(0))) return(NULL)
   
