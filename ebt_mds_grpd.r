@@ -1,11 +1,11 @@
 ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
-
+  
   # Notwendige libraries
   library(tidyverse)
   library(lubridate)
   
   # Auswahl der Periode 
-  period_list = c("day", "week", "month", "3 month", "6 month", "year", "3 year")
+  period_list = c("overall", "day", "week", "month", "quarter", "halfyear", "year")
   if(!period %in% period_list) period <- period_list[menu(period_list, title = "choose periode")]
   if(identical(period, character(0))) return(NULL)
   
@@ -17,11 +17,16 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
     mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
            Hits = as.integer(Hits)) -> tmp
-  # Wenn tageweise Gruppierung, dann keine gruppieren notwendig
-  if(period != "day") {
+  # Wenn tageweise, dann kein gruppieren notwendig
+  if(period == "day") tmp <- tmp %>%
+    mutate(Days = 1) %>%
+    select(Date, Deno, Loc, Days, Hits) %>%
+    rename(Period = Date)
+  else {
     # Ergänze Periode
+    if(period == "overall") tmp <- tmp %>% mutate(Period = "overall")
+    else tmp <- tmp %>% mutate(Period = floor_date(Date, unit = period, week_start = 1)) # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
     tmp <- tmp %>% 
-      mutate(Period = floor_date(Date, unit = period, week_start = 1)) %>% # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
       group_by(Period) %>% 
       # Zusammenfassen entsprechend Periode
       summarise(Deno = list(Reduce(`+`, Deno)),
@@ -29,10 +34,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
                 Days = n(),
                 Hits = sum(Hits, na.rm = TRUE),
                 .groups = "drop")
-    } else
-      # Wenn nicht gruppiert wird, dennoch Days = 1 und Date in Period umbenennen
-      tmp <- tmp %>%
-        mutate(Days = 1) %>% select(Date, Deno, Loc, Days, Hits) %>% rename(Period = Date)
+  }
   # Diverse Ableitungen
   tmp <- tmp %>% 
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
@@ -47,4 +49,4 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
     arrange(desc(Period))
   # Rückgabe
   return(tmp)
-  }
+}
