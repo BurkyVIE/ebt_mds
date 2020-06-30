@@ -15,7 +15,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
     enframe(name = NULL, value = "Date") %>% # in einen Tibble umwandeln ...
     left_join(mds_data, by = "Date") %>%     # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
-    mutate(Deno = map(.x = Deno, .f = function(x = .) c(as.integer(x), integer(7 - length(x)))),
+    mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) -> tmp
   # Wenn tageweise, dann kein gruppieren notwendig
   if(period == "day") tmp <- tmp %>%
