@@ -1,4 +1,4 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
   
   # Notwendige libraries
   library(tidyverse)
@@ -6,7 +6,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = FALSE, invert = FALSE) {
   
   # Auswahl der Periode 
   period_list = c("overall", "day", "week", "month", "quarter", "halfyear", "year", "10 years")
-  if(!period %in% period_list) period <- period_list[menu(period_list, title = "choose periode")]
+  if(is.null(period)) period <- period_list[menu(period_list, title = "choose periode")]
   if(identical(period, character(0))) return(NULL)
   
   # Erstelle vollständige Liste der möglichen Daten
