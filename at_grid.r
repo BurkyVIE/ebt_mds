@@ -5,7 +5,7 @@ library(sf)
 # EBT-Grid of Europe
 raster <- list(long = seq(-12, 54, length = 158),
                lat = seq(29, 71, length = 151))
-grid <- crossing(lat = raster$lat %>% head(-1),
+grid <- crossing(lat = raster$lat %>% head(-1),     # letzter Punkt ergibt sich rechnerisch, daher hier weg
                  long = raster$long %>% head(-1)) %>%
   rowid_to_column(var = "ID") %>% 
   mutate(dot = map2(.x = long, .y = lat,   # corners to all squares (must be closed)
@@ -27,7 +27,7 @@ locs <- pseudo %>%
 
 # Bounding box for data reduction
 #box <- (st_bbox(map_at) + 3 *c(-66/157, -42/150, 66/157, 42/150))[c(1, 1, 3, 3, 1, 2, 4, 4, 2, 2)] %>% # add x times size of one dot to every side
-box <- (c(-12 + 51 * 66/157, 29 + 62 * 42/150, -12 + 70 * 66/157, 29 + 72 * 42/150) + 3 *c(-66/157, -42/150, 66/157, 42/150))[c(1, 1, 3, 3, 1, 2, 4, 4, 2, 2)] %>% # add x times size of one dot to every side
+box <- (c(-12 + 51 * 66/157, 29 + 62 * 42/150, -12 + 70 * 66/157, 29 + 72 * 42/150) + 2.5 *c(-66/157, -42/150, 66/157, 42/150))[c(1, 1, 3, 3, 1, 2, 4, 4, 2, 2)] %>% # add x times size of one dot to every side
   matrix(ncol = 2) %>%
   list() %>%
   st_polygon() %>%
@@ -57,7 +57,7 @@ locs <- st_transform(locs, crs = 3416)
 visited <- st_transform(visited, crs = 3416)
 
 #Farben
-colors <- c("wheat", "grey65", "red3", "grey35", "darkblue", "darkblue")
+colors <- c("wheat", "grey65", "red3", "grey35", "blue", "blue3")
 
 # Plot
 p <- ggplot() +
