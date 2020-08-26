@@ -37,6 +37,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
   }
   # Diverse Ableitungen
   tmp <- tmp %>% 
+    replace_na(list(Hits = 0)) %>%
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
            Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
