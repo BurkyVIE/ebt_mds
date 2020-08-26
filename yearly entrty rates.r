@@ -37,7 +37,7 @@ library(lubridate)
 top <- 3
 
 ebt_mds_grpd(per = "week") %>% 
-  mutate(Year = year(Period),
+  mutate(Year = year(Period + days(3)), # 3 wg Mittwoch der Woch; dieser entscheidet ob Woche 1 im Jahr+1 oder Woche 53
          Year2 = case_when(Year < (max(Year) - top + 1) ~ "older",
                            TRUE ~ as.character(Year)),
          Course = week(Period)) %>% 
