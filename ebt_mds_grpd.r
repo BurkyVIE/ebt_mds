@@ -16,7 +16,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
     left_join(mds_data, by = "Date") %>%     # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
-           Hits = as.integer(Hits)) -> tmp
+           Hits = as.integer(Hits)) %>%
+    replace_na(list(Hits = 0)) -> tmp
   # Wenn tageweise, dann kein gruppieren notwendig
   if(period == "day") tmp <- tmp %>%
     mutate(Days = 1) %>%
@@ -37,7 +38,6 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
   }
   # Diverse Ableitungen
   tmp <- tmp %>% 
-    replace_na(list(Hits = 0)) %>%
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
            Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
