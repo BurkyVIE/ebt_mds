@@ -49,7 +49,7 @@ ebt_mds_grpd(per = "week") %>%
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
   scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
   scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
-  scale_x_continuous(name = "Course (week = 7 day periods)") +
+  scale_x_continuous(name = "Course (week)") +
   scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000) +
   labs(title = "Entries Throughout the Year") +
   theme_ebt() -> p 
