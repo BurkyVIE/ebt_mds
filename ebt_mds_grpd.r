@@ -46,7 +46,10 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
-           EntRtPerc = ecdf(EntRt)(EntRt))
+           AvPctl = ecdf(Avg)(Avg),
+           HRPctl = ecdf(HitRt)(HitRt),
+           ERPctl = ecdf(EntRt)(EntRt),
+           LRPctl = ecdf(LocRt)(LocRt))
   # Umkehren der Reihenfolge (letzte oben)
   if(invert) tmp <- tmp %>%
     arrange(desc(Period))
