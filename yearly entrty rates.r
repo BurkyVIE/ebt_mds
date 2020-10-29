@@ -4,6 +4,11 @@ library(tidyverse)
 library(lubridate)
 
 top <- 3
+slopes <- tibble(slope = c(50, 100, 150, 200, 250)) %>%
+  mutate(x = sqrt(75000**2 / (slope**2 + (75000**2/365**2))), #xmax = 365, ymax = 75000
+         y = x * slope,
+         label = paste0(slope,"/d"))
+
 
 ebt_mds_full %>%
   arrange(Date) %>% 
@@ -15,7 +20,8 @@ ebt_mds_full %>%
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
   ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
-  geom_abline(slope = c(100, 200, 300), color = "white", linetype = "dashed", size = 1) +
+  geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
+  geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
   scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
   scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
@@ -27,16 +33,21 @@ ebt_mds_full %>%
 windows(16, 9)
 plot(p)
 
-rm(top, p)
+rm(top, slopes, p)
 
-                     
-                     
+
+
 # Wöchentlich
 
 library(tidyverse)
 library(lubridate)
 
 top <- 3
+slopes <- tibble(slope0 = c(50, 100, 150, 200, 250)) %>%
+  mutate(slope = slope0 * 7,
+         x = sqrt(75000**2 / (slope**2 + (75000**2/52**2))), #xmax = 52, ymax = 75000
+         y = x * slope,
+         label = paste0(slope0,"/d"))
 
 ebt_mds_grpd(per = "week") %>% 
   mutate(Year = year(Period + days(3)), # 3 wg Mittwoch der Woch; dieser entscheidet ob Woche 1 im Jahr+1 oder Woche 53
@@ -47,7 +58,8 @@ ebt_mds_grpd(per = "week") %>%
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
   ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
-  geom_abline(slope = c(100, 200, 300) * 7, color = "white", linetype = "dashed", size = 1) +
+  geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
+  geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
   scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
   scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
@@ -59,9 +71,9 @@ ebt_mds_grpd(per = "week") %>%
 windows(16, 9)
 plot(p)
 
-rm(top, p)
+rm(top, slopes, p)
 
-                     
+
 
 # Monatlich
 
@@ -69,6 +81,11 @@ library(tidyverse)
 library(lubridate)
 
 top <- 3
+slopes <- tibble(slope0 = c(50, 100, 150, 200, 250)) %>%
+  mutate(slope = slope0 * (365.2475 / 12),
+         x = sqrt(75000**2 / (slope**2 + (75000**2/12**2))), #xmax = 12, ymax = 75000
+         y = x * slope,
+         label = paste0(slope0,"/d"))
 
 ebt_mds_grpd(per = "month") %>% 
   mutate(Year = year(Period),
@@ -79,7 +96,8 @@ ebt_mds_grpd(per = "month") %>%
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
   ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
-  geom_abline(slope = c(100, 200, 300) * (365.2475 / 12), color = "white", linetype = "dashed", size = 1) +
+  geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
+  geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
   scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
   scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
@@ -91,4 +109,4 @@ ebt_mds_grpd(per = "month") %>%
 windows(16, 9)
 plot(p)
 
-rm(top, p)
+rm(top, slopes, p)
