@@ -18,7 +18,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) %>%
-    replace_na(list(Hits = 0)) -> tmp
+    replace_na(list(Hits = 0L)) -> tmp
   # Wenn tageweise, dann kein gruppieren notwendig
   if(period == "day") tmp <- tmp %>%
     mutate(Days = 1) %>%
