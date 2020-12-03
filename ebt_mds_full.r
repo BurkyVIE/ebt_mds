@@ -43,6 +43,16 @@ rm(tmp)
 
 
 ### Expandieren der Denos
+# vec2tib <- function(x){
+#   x <- c(x, integer(7))[1:7]
+#   names(x) <- paste0("E", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500)))
+#   return(as_tibble_row(x))
+# }
+# ebt_mds %>% mutate(map_dfr(Deno, ~vec2tib(.)))
+# rm(vec2tib)
+#
+# OR
+#
 # ebt_mds_full %>% 
 #   bind_cols(
 #     ebt_mds_full$Deno %>%
