@@ -1,4 +1,4 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
   
   # Notwendige libraries
   library(tidyverse)
@@ -51,7 +51,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, invert = FALSE) {
            ERPctl = ecdf(EntRt)(EntRt),
            LRPctl = ecdf(LocRt)(LocRt))
   # Umkehren der Reihenfolge (letzte oben)
-  if(invert) tmp <- tmp %>%
+  if(reverse) tmp <- tmp %>%
     arrange(desc(Period))
   # Rückgabe
   return(tmp)
