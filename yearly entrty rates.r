@@ -3,37 +3,44 @@
 library(tidyverse)
 library(lubridate)
 
-top <- 3
-slopes <- tibble(slope = c(50, 100, 150, 200, 250)) %>%
-  mutate(x = sqrt(75000**2 / (slope**2 + (75000**2/365**2))), #xmax = 365, ymax = 75000
+last <- 3
+slopes <- tibble(slope = c(50, 100, 200, 300)) %>%
+  mutate(x = sqrt(80000**2 / (slope**2 + (80000**2/365**2))), #xmax = 365, ymax = 80000
          y = x * slope,
          label = paste0(slope,"/d"))
 
-
-ebt_mds_full %>%
-  arrange(Date) %>% 
-  mutate(Year = year(Date),
-         Year2 = case_when(Year < (max(Year) - top + 1) ~ "older",
-                           TRUE ~ as.character(Year)),
-         Course = yday(Date)) %>% 
+he <- ebt_mds_grpd(period = "day") %>%
+  select(Period, Count) %>% 
+  mutate(Year = year(Period),
+         Time = yday(Period))
+he %>% 
+  group_by(Year) %>%
+  summarise(Year = first(Year),
+            Time = min(Time)-1,
+            Count = 0,
+            .groups = "drop") %>% 
+  bind_rows(he, .) %>%
+  arrange(Year, Time) %>% 
   group_by(Year) %>% 
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
-  ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
+  mutate(Year2 = case_when(Year < (max(Year) - last + 1) ~ "older",
+                           TRUE ~ as.character(Year))) %>% 
+  ggplot(data = ., mapping = aes(x = Time, y = cumCount)) +
   geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
   geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
-  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
-  scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
-  scale_x_continuous(name = "Course (day of year)") +
-  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000) +
-  labs(title = "Entries Throughout the Year") +
+  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(last, "Set1")), "grey")) +
+  scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
+  scale_x_continuous(name = "Time Elapsed (Days)", breaks = function(x)seq(0, x[2], by = 60), expand = c(.01, .01)) +
+  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
+  labs(title = "Aggregation of Entries over the Years") +
   theme_ebt() -> p 
 
 windows(16, 9)
 plot(p)
 
-rm(top, slopes, p)
+rm(last, slopes, he, p)
 
 
 
@@ -42,36 +49,45 @@ rm(top, slopes, p)
 library(tidyverse)
 library(lubridate)
 
-top <- 3
-slopes <- tibble(slope0 = c(50, 100, 150, 200, 250)) %>%
+last <- 3
+slopes <- tibble(slope0 = c(50, 100, 200, 300)) %>%
   mutate(slope = slope0 * 7,
-         x = sqrt(75000**2 / (slope**2 + (75000**2/52**2))), #xmax = 52, ymax = 75000
+         x = sqrt(80000**2 / (slope**2 + (80000**2/52**2))), #xmax = 52, ymax = 80000
          y = x * slope,
          label = paste0(slope0,"/d"))
 
-ebt_mds_grpd(per = "week") %>% 
+he <- ebt_mds_grpd(period = "week") %>%
+  select(Period, Count) %>% 
   mutate(Year = year(Period + days(3)), # 3 wg Mittwoch der Woch; dieser entscheidet ob Woche 1 im Jahr+1 oder Woche 53
-         Year2 = case_when(Year < (max(Year) - top + 1) ~ "older",
-                           TRUE ~ as.character(Year)),
-         Course = isoweek(Period)) %>% 
+         Time = isoweek(Period))
+he %>% 
+  group_by(Year) %>%
+  summarise(Year = first(Year),
+            Time = min(Time)-1,
+            Count = 0,
+            .groups = "drop") %>% 
+  bind_rows(he, .) %>%
+  arrange(Year, Time) %>% 
   group_by(Year) %>% 
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
-  ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
+  mutate(Year2 = case_when(Year < (max(Year) - last + 1) ~ "older",
+                           TRUE ~ as.character(Year))) %>% 
+  ggplot(data = ., mapping = aes(x = Time, y = cumCount)) +
   geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
   geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
-  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
-  scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
-  scale_x_continuous(name = "Course (week)") +
-  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000) +
-  labs(title = "Entries Throughout the Year") +
-  theme_ebt() -> p 
+  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(last, "Set1")), "grey")) +
+  scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
+  scale_x_continuous(name = "Time Elapsed (Weeks)", breaks = function(x)seq(0, x[2], by = 8), expand = c(.01, .01)) +
+  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
+  labs(title = "Aggregation of Entries over the Years") +
+  theme_ebt() -> p
 
 windows(16, 9)
 plot(p)
 
-rm(top, slopes, p)
+rm(last, slopes, he, p)
 
 
 
@@ -80,33 +96,42 @@ rm(top, slopes, p)
 library(tidyverse)
 library(lubridate)
 
-top <- 3
-slopes <- tibble(slope0 = c(50, 100, 150, 200, 250)) %>%
+last <- 3
+slopes <- tibble(slope0 = c(50, 100, 200, 300)) %>%
   mutate(slope = slope0 * (365.2475 / 12),
-         x = sqrt(75000**2 / (slope**2 + (75000**2/12**2))), #xmax = 12, ymax = 75000
+         x = sqrt(80000**2 / (slope**2 + (80000**2/12**2))), #xmax = 12, ymax = 80000
          y = x * slope,
          label = paste0(slope0,"/d"))
 
-ebt_mds_grpd(per = "month") %>% 
+he <- ebt_mds_grpd(period = "month") %>%
+  select(Period, Count) %>% 
   mutate(Year = year(Period),
-         Year2 = case_when(Year < (max(Year) - top + 1) ~ "older",
-                           TRUE ~ as.character(Year)),
-         Course = month(Period)) %>% 
+         Time = month(Period))
+he %>% 
+  group_by(Year) %>%
+  summarise(Year = first(Year),
+            Time = min(Time)-1,
+            Count = 0,
+            .groups = "drop") %>% 
+  bind_rows(he, .) %>%
+  arrange(Year, Time) %>% 
   group_by(Year) %>% 
   mutate(cumCount = cumsum(Count)) %>% 
   ungroup() %>% 
-  ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
+  mutate(Year2 = case_when(Year < (max(Year) - last + 1) ~ "older",
+                           TRUE ~ as.character(Year))) %>% 
+  ggplot(data = ., mapping = aes(x = Time, y = cumCount)) +
   geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", size = 1) +
   geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
-  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(top, "Set1")), "grey")) +
-  scale_size_manual(name = "", values = c(rep(2.5, top), 1.5)) +
-  scale_x_continuous(name = "Course (month)", breaks = (0:4) * 3) +
-  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000) +
-  labs(title = "Entries Throughout the Year") +
+  scale_color_manual(name = "", values = c(rev(RColorBrewer::brewer.pal(last, "Set1")), "grey")) +
+  scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
+  scale_x_continuous(name = "Time Elapsed (Months)", breaks = function(x)seq(0, x[2], by = 2), expand = c(.01, .01)) +
+  scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
+  labs(title = "Aggregation of Entries over the Years") +
   theme_ebt() -> p
 
 windows(16, 9)
 plot(p)
 
-rm(top, slopes, p)
+rm(last, slopes, he, p)
