@@ -45,7 +45,7 @@ rm(tmp)
 ### Expandieren der Denos
 # ebt_mds %>%
 #   mutate(map_dfr(Deno, ~c(., integer(7))[1:7] %>%
-#                    set_names(paste0("E", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500)))) %>%
+#                    set_names(paste0("E", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500)))) %>%   # or (c(1, 2, 5) * 10 ** rep(0:2, each = 3))[3:9]
 #                    as_tibble_row()))
 #
 # OR
