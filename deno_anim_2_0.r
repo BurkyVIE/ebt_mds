@@ -14,10 +14,10 @@ dat %>% select(Period, Deno) %>%
   pivot_longer(starts_with("EUR_"), names_to = "Denomination", values_to = "Count") %>%
   ggplot(mapping = aes(x = Denomination, y = Count, group = Denomination)) +
   geom_col(mapping = aes(fill = Denomination), show.legend = FALSE) +
-  geom_point(mapping = aes(shape = Q4), show.legend = FALSE) +
+  geom_point(mapping = aes(shape = Q4), size = 8, show.legend = FALSE) +
   scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000) +
   scale_fill_manual(values = c("#CCCCCC","#FF9999","#99CCFF","#FFCC99","#66CC66","#FFCC33","#B299CC")) +
-  scale_shape_manual(values = c(NA, 1)) +
+  scale_shape_manual(values = c("", "-")) +
   labs(title = "Denominations entered by Burky",
        subtitle = "as Quarter {quarter(frame_time, with_year = TRUE)} (cumulated)") +
   theme_ebt() +
@@ -25,6 +25,7 @@ dat %>% select(Period, Deno) %>%
   ease_aes("quartic-in") +
   shadow_mark() -> p
 
-animate(p, nframes = pull(tally(dat), n) * 10, duration = 10, end_pause = 100, width = 9 * 55, height = 16 * 55, renderer = gifski_renderer("spec/deno_anim.gif"))
+animate(p, nframes = pull(tally(dat), n) * 10, duration = 10, end_pause = 100, width = 9 * 55, height = 16 * 55,
+        renderer = gifski_renderer("spec/deno_anim.gif"))
 
 rm(dat, p)
