@@ -8,7 +8,7 @@ dat <- ebt_mds_grpd(period = "quarter")
 dat %>% select(Period, Deno) %>%
   transmute(Quarter = Period,
             map_dfr(Deno, ~set_names(., paste0("EUR_", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500))))),
-            Q4 = case_when(month(Period) == 10 ~ TRUE,
+            Q4 = case_when(quarter(Period) == 4 ~ TRUE,
                            TRUE ~ NA)) %>%
   mutate(across(starts_with("EUR_"), cumsum)) %>% 
   pivot_longer(starts_with("EUR_"), names_to = "Denomination", values_to = "Count") %>%
