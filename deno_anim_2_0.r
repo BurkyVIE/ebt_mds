@@ -14,7 +14,7 @@ dat %>% select(Period, Deno) %>%
   pivot_longer(starts_with("EUR_"), names_to = "Denomination", values_to = "Count") %>%
   ggplot(mapping = aes(x = Denomination, y = Count, group = Denomination)) +
   geom_col(mapping = aes(fill = Denomination), show.legend = FALSE) +
-  geom_point(mapping = aes(shape = Q4), size = 8, show.legend = FALSE) +
+  geom_point(mapping = aes(shape = Q4), size = 7, show.legend = FALSE) +
   scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000) +
   scale_fill_manual(values = c("#CCCCCC","#FF9999","#99CCFF","#FFCC99","#66CC66","#FFCC33","#B299CC")) +
   scale_shape_manual(values = c("", "-")) +
