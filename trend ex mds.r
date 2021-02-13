@@ -1,14 +1,14 @@
 library(tidyverse)
 
-ebt_grpd <- ebt_mds_grpd(period = "month") %>%  # Daten für den Plot
-  arrange(Period)                               # Last is last
+ebt_grpd <- ebt_mds_grpd(period = "month") # Daten für den Plot
 
 p <- ebt_grpd  %>%
-  mutate_at(vars(Count, Value, Hits), .funs = ~(. / Days)) %>% # Berechnungen für pro Tag
+  mutate(across(c(Count, Value, Hits), .fns = ~(. / Days))) %>% # Berechnungen für pro Tag
   mutate(Color = c(rep("old", n() - 1), "recent")) %>%
-  select(-Deno, -Loc, -EntRt, -LocRt) %>% 
+  select(-Deno, -Loc, -(EntRt:LRPctl)) %>% 
   # Überführen der Spalten in eine Variable
-  gather(-Period, -Days, -Color, key = "What", value = "Count") %>%
+  pivot_longer(Hits:HitRt, names_to = "What", values_to = "Count") %>% 
+#  gather(-Period, -Days, -Color, key = "What", value = "Count") %>%
   # Festlegen der Reihenfolge der Plots
   mutate(What = What %>%
            factor(levels = c("Count", "Value", "Avg", "Hits", "HitRt", "nLoc"),
