@@ -15,6 +15,7 @@ dat %>% select(Period, Deno) %>%
   ggplot(mapping = aes(x = Denomination, y = Count, group = Denomination)) +
   geom_col(mapping = aes(fill = Denomination), show.legend = FALSE) +
   geom_point(mapping = aes(shape = Q4), color = "grey25", na.rm = TRUE, show.legend = FALSE) +
+  scale_x_discrete(labels = paste0(c(5, 10, 20, 50, 100, 200, 500), " EUR")) +
   scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000) +
   scale_fill_manual(values = c("#CCCCCC","#FF9999","#99CCFF","#FFCC99","#66CC66","#FFCC33","#B299CC")) +
   scale_shape_manual(values = c(1)) +
