@@ -6,7 +6,7 @@ source("ebt_mds_grpd.r")
 
 dat <- ebt_mds_grpd(period = "halfyear")
 dat %>% select(Period, Deno) %>%
-  transmute(Semester = Period,
+  transmute(Halfyear = Period,
             map_dfr(Deno, ~set_names(., paste0("EUR_", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500))))),
             H2 = case_when(semester(Period) == 2 ~ TRUE,
                            TRUE ~ NA)) %>%
@@ -20,9 +20,9 @@ dat %>% select(Period, Deno) %>%
   scale_fill_manual(values = c("#CCCCCC","#FF9999","#99CCFF","#FFCC99","#66CC66","#FFCC33","#B299CC")) +
   scale_shape_manual(values = c(1)) +
   labs(title = "Denominations entered by Burky",
-       subtitle = "as Semester {semester(frame_time, with_year = TRUE)} (cumulated; o = End of Year)") +
+       subtitle = "as Halfyear {semester(frame_time, with_year = TRUE)} (cumulated; o = End of Year)") +
   theme_ebt() +
-  transition_time(Semester) +
+  transition_time(Halfyear) +
   ease_aes("quartic-in") +
   shadow_mark() -> p
 
