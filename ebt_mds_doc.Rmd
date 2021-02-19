@@ -218,12 +218,7 @@ Distribution of denominations by year:
 ```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
 
 ebt_mds_full %>% 
-  bind_cols(
-    ebt_mds_full$Deno %>%
-      do.call(rbind, .) %>%
-      as_tibble(.name_repair = "minimal") %>%
-      setNames(., paste0("€ ", c(5, 10, 20, 50, 100, 200, 500)))
-  ) %>% 
+  mutate(map_dfr(Deno, ~ set_names(., paste0("€ ", c(5, 10, 20, 50, 100, 200, 500))))) %>% 
   group_by(Year = lubridate::year(Date)) %>% 
   summarise(across(.cols = `€ 5`:`€ 500`, .fns = sum), .groups = "drop") %>% 
   gather(-Year, key = Denomination, value = Count) %>% 
