@@ -1,4 +1,7 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, grouping = Period, period = NULL, reverse = FALSE) {
+  
+  grouping = enquo(grouping)
+  grouping_nm = quo_name(grouping)
   
   # Notwendige libraries
   library(tidyverse)
@@ -23,15 +26,15 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
   # Spezialfälle 
   skip <- FALSE
   if(period == "day") {
-    tmp <- tmp %>% rename(Period = Date)
+    tmp <- tmp %>% rename(!!grouping_nm := Date)
     skip <- TRUE
   }
   if(period == "weekday") {
-    tmp <- tmp %>% mutate(Period = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
+    tmp <- tmp %>% mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
     skip <- TRUE
   }
   if(period == "overall") {
-    tmp <- tmp %>% mutate(Period = "overall")
+    tmp <- tmp %>% mutate(!!grouping_nm := "overall")
     skip <- TRUE
   }
   # Quasi: else-Zweig der Spezialfälle
@@ -39,7 +42,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
   # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
 
   tmp <- tmp %>% 
-    group_by(Period) %>% 
+    group_by(!!grouping) %>% 
     # Zusammenfassen entsprechend Periode
     summarise(Deno = list(Reduce(`+`, Deno)),
               Loc = list(Reduce(union, Loc)),
@@ -62,7 +65,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
 
   # Umkehren der Reihenfolge (letzte oben)
   if(reverse) tmp <- tmp %>%
-    arrange(desc(Period))
+    arrange(desc(!!grouping))
 
   # Rückgabe
   return(tmp)
