@@ -38,7 +38,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, grouping = Period, period = NULL, r
     skip <- TRUE
   }
   # Quasi: else-Zweig der Spezialfälle
-  if(!skip) tmp <- tmp %>% mutate(Period = floor_date(Date, unit = period, week_start = 1))
+  if(!skip) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
 
   tmp <- tmp %>% 
