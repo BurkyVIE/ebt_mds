@@ -1,4 +1,4 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, grouping = Period, period = NULL, reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grouping = Period, reverse = FALSE) {
   
   grouping = enquo(grouping)
   grouping_nm = quo_name(grouping)
