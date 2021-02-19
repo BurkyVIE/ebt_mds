@@ -5,12 +5,12 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
   library(lubridate)
   
   # Auswahl der Periode 
-  period_list = c("overall", "day", "week", "month", "quarter", "halfyear", "year")
-  if(is.null(period)) period <- period_list[menu(period_list, title = "choose periode")]
+  period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
+  if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")]
   if(identical(period, character(0))) return(NULL)
   
   # Erstelle vollständige Liste der möglichen Daten
- mds_data %>% 
+  mds_data %>% 
     pull(Date) %>%                       # aus den Eingabezeitpunkten ...
     full_seq(1) %>%                      # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     tibble("Date" = .) %>%               # in einen Tibble umwandeln ...
@@ -19,24 +19,33 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) %>%
     replace_na(list(Hits = 0L)) -> tmp
-  # Wenn tageweise, dann kein gruppieren notwendig
-  if(period == "day") tmp <- tmp %>%
-    mutate(Days = 1) %>%
-    select(Date, Deno, Loc, Days, Hits) %>%
-    rename(Period = Date)
-  else {
-    # Ergänze Periode
-    if(period == "overall") tmp <- tmp %>% mutate(Period = "overall")
-    else tmp <- tmp %>% mutate(Period = floor_date(Date, unit = period, week_start = 1)) # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
-    tmp <- tmp %>% 
-      group_by(Period) %>% 
-      # Zusammenfassen entsprechend Periode
-      summarise(Deno = list(Reduce(`+`, Deno)),
-                Loc = list(Reduce(union, Loc)),
-                Days = n(),
-                Hits = sum(Hits, na.rm = TRUE),
-                .groups = "drop")
+
+  # Spezialfälle 
+  skip <- FALSE
+  if(period == "day") {
+    tmp <- tmp %>% rename(Period = Date)
+    skip <- TRUE
   }
+  if(period == "weekday") {
+    tmp <- tmp %>% mutate(Period = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
+    skip <- TRUE
+  }
+  if(period == "overall") {
+    tmp <- tmp %>% mutate(Period = "overall")
+    skip <- TRUE
+  }
+  # Quasi: else-Zweig der Spezialfälle
+  if(!skip) tmp <- tmp %>% mutate(Period = floor_date(Date, unit = period, week_start = 1))
+  # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
+
+  tmp <- tmp %>% 
+    group_by(Period) %>% 
+    # Zusammenfassen entsprechend Periode
+    summarise(Deno = list(Reduce(`+`, Deno)),
+              Loc = list(Reduce(union, Loc)),
+              Days = n(),
+              Hits = sum(Hits, na.rm = TRUE),
+              .groups = "drop")
   # Diverse Ableitungen
   tmp <- tmp %>% 
     mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
@@ -50,9 +59,11 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, reverse = FALSE) {
            HRPctl = ecdf(HitRt)(HitRt),
            ERPctl = ecdf(EntRt)(EntRt),
            LRPctl = ecdf(LocRt)(LocRt))
+
   # Umkehren der Reihenfolge (letzte oben)
   if(reverse) tmp <- tmp %>%
     arrange(desc(Period))
+
   # Rückgabe
   return(tmp)
 }
