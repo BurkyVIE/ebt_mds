@@ -3,12 +3,11 @@ library(tidyverse)
 ebt_grpd <- ebt_mds_grpd(period = "month") # Daten für den Plot
 
 p <- ebt_grpd  %>%
-  mutate(across(c(Count, Value, Hits), .fns = ~(. / Days))) %>% # Berechnungen für pro Tag
+  mutate(across(c(Count, Value, Hits), .fns = ~ (. / Days))) %>% # Berechnungen für pro Tag
   mutate(Color = c(rep("old", n() - 1), "recent")) %>%
   select(-Deno, -Loc, -(EntRt:LRPctl)) %>% 
   # Überführen der Spalten in eine Variable
   pivot_longer(Hits:HitRt, names_to = "What", values_to = "Count") %>% 
-#  gather(-Period, -Days, -Color, key = "What", value = "Count") %>%
   # Festlegen der Reihenfolge der Plots
   mutate(What = What %>%
            factor(levels = c("Count", "Value", "Avg", "Hits", "HitRt", "nLoc"),
@@ -18,7 +17,7 @@ p <- ebt_grpd  %>%
   #  geom_line(color = "grey75") +
   geom_point(mapping = aes(color = Color), shape = 4, size = 0.9, stroke = 1.25, alpha = 0.67, show.legend = FALSE) +
   geom_smooth(color = "orangered", method = "loess", span = 1.5 / log(ebt_grpd$Period %>% length()), se = FALSE) +
-  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y", expand = c(.01, .01)) +
   scale_color_manual(values = c("old" = "mediumblue", "recent" = "mediumseagreen")) +
   labs(title = "Monthly entries to EBT by Burky",
        caption = paste0("by Burky as: ",max(ebt_mds$Date), " (http://www.eurobilltracker.com)"),
