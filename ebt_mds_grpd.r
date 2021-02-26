@@ -1,6 +1,6 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grouping = Period, reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", reverse = FALSE) {
   
-  grouping = enquo(grouping)
+  grouping = sym(grp_nm)
   grouping_nm = quo_name(grouping)
   
   # Notwendige libraries
