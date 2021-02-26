@@ -1,11 +1,11 @@
 ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", reverse = FALSE) {
   
-  grouping = sym(grp_nm)
-  grouping_nm = quo_name(grouping)
-  
   # Notwendige libraries
   library(tidyverse)
   library(lubridate)
+  
+  grouping = sym(grp_nm)
+  grouping_nm = quo_name(grouping)
   
   # Auswahl der Periode 
   period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
@@ -62,6 +62,20 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
            HRPctl = ecdf(HitRt)(HitRt),
            ERPctl = ecdf(EntRt)(EntRt),
            LRPctl = ecdf(LocRt)(LocRt))
+  
+  # Labels
+  if(period == "month") {
+    tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = !!grouping)
+  }
+  if(period %in% c("quarter", "3 month")) {
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "Q", quarter(Period))) %>% relocate(Label, .after = !!grouping)
+  }
+  if(period %in% c("halfyear", "6 month")) {
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "/", c("I", "II")[semester(Period)])) %>% relocate(Label, .after = !!grouping)
+  }
+  if(period == "year") {
+    tmp <- tmp %>% mutate(Label = (year(!!grouping))) %>% relocate(Label, .after = !!grouping)
+  }
 
   # Umkehren der Reihenfolge (letzte oben)
   if(reverse) tmp <- tmp %>%
