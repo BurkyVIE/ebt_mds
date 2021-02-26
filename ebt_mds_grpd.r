@@ -67,6 +67,9 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
   if(period == "month") {
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = !!grouping)
   }
+  if(period == "2 month") {
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(Period) - 1) %/% 2 + 1, "/6")) %>% relocate(Label, .after = !!grouping)
+  }
   if(period %in% c("quarter", "3 month")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "Q", quarter(Period))) %>% relocate(Label, .after = !!grouping)
   }
