@@ -71,13 +71,13 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(Period) - 1) %/% 2 + 1, "/6")) %>% relocate(Label, .after = !!grouping)
   }
   if(period %in% c("quarter", "3 month")) {
-    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "Q", quarter(Period))) %>% relocate(Label, .after = !!grouping)
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " Q", quarter(Period))) %>% relocate(Label, .after = !!grouping)
   }
   if(period == "4 month") {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(Period) - 1) %/% 4 + 1, "/3")) %>% relocate(Label, .after = !!grouping)
   }
   if(period %in% c("halfyear", "6 month")) {
-    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "/", c("I", "II")[semester(Period)])) %>% relocate(Label, .after = !!grouping)
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " / ", c("I", "II")[semester(Period)])) %>% relocate(Label, .after = !!grouping)
   }
   if(period == "year") {
     tmp <- tmp %>% mutate(Label = (year(!!grouping))) %>% relocate(Label, .after = !!grouping)
