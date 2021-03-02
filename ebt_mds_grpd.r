@@ -65,6 +65,9 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
            LRPctl = ecdf(LocRt)(LocRt))
   
   # Labels
+  if(period == "weekday") {
+    tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
+  }
   if(period == "month") {
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = Loc)
   }
