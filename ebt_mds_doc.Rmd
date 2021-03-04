@@ -65,8 +65,7 @@ The five longest active periods were:
 ebt_mds_full %>%
   add_column(Type = (ebt_mds_full$Count > 0) %>%
                rle %>%
-               `[`(1) %>%
-               unlist() %>%
+               `[[`(1) %>%
                as.numeric() %>%
                rep(1:length(.), .)) %>% 
   group_by(Type) %>% 
