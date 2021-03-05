@@ -62,14 +62,14 @@ Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **lo
 The five longest active periods were:
 ```{r periods, echo=FALSE}
 
-ebt_mds_full %>%
+ebt_mds_full %>% 
   add_column(Type = (pull(., Count) > 0) %>%
                rle() %>%
                `[[`(1) %>%
-               rep(1:length(.), .)) %>% 
+               rep(1:length(.), .)) %>%
   group_by(Type) %>% 
-  summarise(From = first(Date),
-            To = last(Date),
+  summarise(From = min(Date),
+            To = max(Date),
             Days = n(),
             Bills = sum(Count),
             Value = sum(Value),
@@ -78,7 +78,8 @@ ebt_mds_full %>%
             Avg = (Value / Bills) %>% round(2),
             HitRt = (Bills / Hits) %>% round(2),
             .groups = "drop") %>% 
-  mutate(Type = rep(c("Active", "Inactive"), length.out = nrow(.))) %>% 
+  mutate(Type = case_when(Bills == 0 ~ "Inactive",
+                          TRUE ~ "Active")) %>% 
   arrange(desc(Days)) %>%
   filter(Type == "Active") %>% 
   select(-Type) %>% 
