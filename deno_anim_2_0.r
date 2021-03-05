@@ -4,7 +4,7 @@ library(gganimate)
 
 source("ebt_mds_grpd.r")
 
-dat <- ebt_mds_grpd(period = "halfyear", grouping = Halfyear)
+dat <- ebt_mds_grpd(period = "halfyear", grp_nm = "Halfyear")
 dat %>% select(Halfyear, Deno) %>%
   transmute(Halfyear,
             map_dfr(Deno, ~set_names(., paste0("EUR_", sprintf("%03d", c(5, 10, 20, 50, 100, 200, 500))))),
