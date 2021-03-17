@@ -78,10 +78,10 @@ ebt_mds_full %>%
             Avg = (Value / Bills) %>% round(2),
             HitRt = (Bills / Hits) %>% round(2),
             .groups = "drop") %>% 
-  mutate(Type = case_when(Bills == 0 ~ "Inactive",
-                          TRUE ~ "Active")) %>% 
+  mutate(Type = case_when(Bills == 0 ~ "inactive",
+                          TRUE ~ "active")) %>% 
   arrange(desc(Days)) %>%
-  filter(Type == "Active") %>% 
+  filter(Type == "active") %>% 
   select(-Type) %>% 
   head(5) -> tmp
   knitr::kable(tmp, format.args = list(big.mark = ','))
@@ -203,7 +203,7 @@ ebt_mds_full$Deno %>%
   mutate(Val = substr(Denomination, 2, 4) %>% as.integer(),
          Denomination = factor(Denomination, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
                                  stringr::str_pad(., width = 3, side = "left") %>% 
-                                 paste0("â‚¬ ", .)),
+                                 paste0("€ ", .)),
          Value = Count * Val,
          C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
          V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
@@ -217,12 +217,12 @@ Distribution of denominations by year:
 ```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
 
 ebt_mds_full %>% 
-  mutate(map_dfr(Deno, ~ set_names(., paste0("â‚¬ ", c(5, 10, 20, 50, 100, 200, 500))))) %>% 
+  mutate(map_dfr(Deno, ~ set_names(., paste0("€ ", c(5, 10, 20, 50, 100, 200, 500))))) %>% 
   group_by(Year = lubridate::year(Date)) %>% 
-  summarise(across(.cols = `â‚¬ 5`:`â‚¬ 500`, .fns = sum), .groups = "drop") %>% 
-  #summarise_at(.vars = vars(`â‚¬ 5`:`â‚¬ 500`), .f = ~ sum(.), .groups = "drop") %>% 
+  summarise(across(.cols = `€ 5`:`€ 500`, .fns = sum), .groups = "drop") %>% 
+  #summarise_at(.vars = vars(`€ 5`:`€ 500`), .f = ~ sum(.), .groups = "drop") %>% 
   gather(-Year, key = Denomination, value = Count) %>% 
-  mutate(Denomination = factor(Denomination, levels = paste0("â‚¬ ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp
+  mutate(Denomination = factor(Denomination, levels = paste0("€ ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp
 
 p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denomination)) +
   geom_bar(mapping = aes(fill = Denomination), stat = "identity") +
@@ -257,9 +257,9 @@ ebt_mds_full %>%
             Avg = (Value / Bills) %>% round(2),
             HitRt = (Bills / Hits) %>% round(2),
             .groups = "drop") %>% 
-  mutate(Type = case_when(Hits == 0 ~ "Inactive",
-                          TRUE ~ "Active")) %>% 
-  filter(Type == "Active") -> streaks
+  mutate(Type = case_when(Hits == 0 ~ "inactive",
+                          TRUE ~ "active")) %>% 
+  filter(Type == "active") -> streaks
   streaks %>% 
     arrange(desc(Days), HitRt) %>% 
     filter(Days >= nth_max(Days, 5)) %>% 
