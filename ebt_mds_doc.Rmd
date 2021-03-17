@@ -259,10 +259,27 @@ ebt_mds_full %>%
             .groups = "drop") %>% 
   mutate(Type = case_when(Hits == 0 ~ "Inactive",
                           TRUE ~ "Active")) %>% 
-  filter(Type == "Active") %>%
-  arrange(desc(Days), HitRt) %>% 
-  filter(Days >= nth_max(Days, 5)) %>% 
-  select(-Type) -> tmp
+  filter(Type == "Active") -> streaks
+  streaks %>% 
+    arrange(desc(Days), HitRt) %>% 
+    filter(Days >= nth_max(Days, 5)) %>% 
+    select(-Type) -> tmp
   knitr::kable(tmp, format.args = list(big.mark = ','))
+
+```
+
+Plot of last 13 streaks:
+
+```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+
+p <- streaks %>% arrange(From) %>% tail(13) %>%
+  ggplot() +
+  geom_rect(mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
+  scale_x_date(date_labels = "%m/%Y") +
+  scale_fill_viridis_c(name = "Hit ratio", direction = -1) +
+  labs(x = "Time", y = "Hits per Day") +
+  theme_bw()
+
+plot(p)
 
 ```
