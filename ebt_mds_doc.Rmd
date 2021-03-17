@@ -277,7 +277,7 @@ p <- streaks %>% arrange(From) %>% tail(13) %>%
   ggplot() +
   geom_rect(mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
   scale_x_date(date_labels = "%m/%Y") +
-  scale_fill_viridis_c(name = "Hit ratio", direction = -1) +
+  scale_fill_viridis_c(name = "Hit ratio", direction = -1, begin = .1, end = .9) +
   labs(x = "Time", y = "Hits per Day") +
   theme_bw()
 
