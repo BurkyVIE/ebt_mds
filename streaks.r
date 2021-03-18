@@ -2,11 +2,10 @@ library(tidyverse)
 
 streak <- function(data, varname){
   
-  varname = enquo(varname)
-  retKind = paste0("Cons", quo_name(varname))
-  retNo = paste0(quo_name(varname), "Str")
+  retKind = paste0("Cons", ensym(varname))
+  retNo = paste0(ensym(varname), "Str")
 
-  tmp <- tibble(Data = pull(data, !!varname),
+  tmp <- tibble(Data = pull(data, {{varname}}),
                 No = (Data > 0) %>%
                  rle() %>%
                  `[[`(1) %>%
