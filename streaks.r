@@ -18,4 +18,5 @@ streak <- function(data, varname){
   return(tmp %>% select(!!retKind := Kind, !!retNo := No))
 }
 
-ebt_mds_grpd(per = "day") %>% bind_cols(., streak(., Count)) %>% bind_cols(., streak(., Hits))
+# examle
+# ebt_mds_grpd(per = "day") %>% bind_cols(., streak(., Count)) %>% bind_cols(., streak(., Hits))
