@@ -87,3 +87,8 @@ rm(tmp)
 #   filter(purrr::map_lgl(.x = ebt_mds_full$Loc, .f = ~ (intersect(tmp, .) %>% length()) > 0)) %>%
 #   pull(Date)
 # rm(tmp)
+
+
+
+### Geburtstagsscheine
+# ebt_mds_full %>% filter(str_ends(Date, "3-21"))
