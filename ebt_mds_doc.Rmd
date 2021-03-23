@@ -94,7 +94,7 @@ The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")
 ## Yearly Activity
 Entries throughout the year:
 
-```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
 top <- 3
 
@@ -110,11 +110,11 @@ p <- ebt_mds_full %>%
   ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
 #  geom_abline(slope = c(100, 200, 300), color = "grey67", linetype = "dashed", size = 1) +
   geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
+  scale_x_continuous(name = "Course (day of year)", expand = c(.01, .01)) +
+  scale_y_continuous(name = "Cumulative count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
   scale_color_manual(name = "", values = c(colors[c(7, 4, 1)], "grey85")) +
   scale_size_manual(name = "", values = c(rep(2.5, top), 1)) +
-  scale_x_continuous(name = "Course (day of year)") +
-  scale_y_continuous(name = "Cumulative count [k]", labels = function(x) x / 1000) +
-  theme_bw()
+  theme_minimal()
 
 plot(p)
 
@@ -151,7 +151,7 @@ knitr::kable(tail(tmp, 5), format.args = list(big.mark = ','))
 
 Graphical representation of the monthly variation:
 
-```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
 ebt_grpd <- ebt_mds_full %>%
   # Zusammenfassen der Daten pro Monat
@@ -179,11 +179,11 @@ p_dat <- ebt_grpd  %>%
 p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) + 
   geom_point(mapping = aes(color = Color), shape = 4, size = 0.8, alpha = 0.65, show.legend = FALSE) +
   geom_smooth(color = colors[2], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
-  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
+  scale_x_date(name = "Time", date_breaks = "2 years", date_labels = "%Y", expand = c(.01, .01)) +
+  scale_y_continuous(name = "", expand = c(.02, .02)) +
   scale_color_manual(values = c("old" = colors[5], "recent" = colors[7])) +
-  labs(x = "Time", y = "") +
   facet_wrap(~ What, scales = "free_y", ncol = 2) +
-  theme_bw()
+  theme_minimal()
 
 # Plot
 plot(p)
@@ -215,7 +215,7 @@ ebt_mds_full$Deno %>%
 
 Distribution of denominations by year:
 
-```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
 ebt_mds_full %>% 
   mutate(map_dfr(Deno, ~ set_names(., paste0("â‚¬  ", c(5, 10, 20, 50, 100, 200, 500))))) %>% 
@@ -227,9 +227,10 @@ ebt_mds_full %>%
 
 p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denomination)) +
   geom_bar(mapping = aes(fill = Denomination), stat = "identity") +
-  scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000) +
-  scale_fill_viridis_d(direction = -1, begin = .05, end = .95) +
-  theme_bw()
+  scale_x_continuous(expand = c(.01, .01)) +
+  scale_y_continuous(name = "Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
+  scale_fill_viridis_d(name = "Denom.", direction = -1, begin = .05, end = .95) +
+  theme_minimal()
 
 plot(p)
 
@@ -269,17 +270,17 @@ ebt_mds_full %>%
 
 ```
 
-Plot of last 13 streaks:
+Plot of last 21 streaks:
 
-```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.asp=0.5625}
+```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
-p <- streaks %>% arrange(From) %>% tail(13) %>%
+p <- streaks %>% arrange(From) %>% tail(21) %>%
   ggplot() +
   geom_rect(mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
-  scale_x_date(date_labels = "%m/%Y") +
+  scale_x_date(name = "Time", date_labels = "%m/%Y", expand = c(.01, .01)) +
+  scale_y_continuous(name = "Hits per Day", expand = c(.02, .02)) +
   scale_fill_viridis_c(name = "Hit ratio", direction = -1, begin = .05, end = .95) +
-  labs(x = "Time", y = "Hits per Day") +
-  theme_bw()
+  theme_minimal()
 
 plot(p)
 
