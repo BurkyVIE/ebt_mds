@@ -7,7 +7,7 @@ ggplot() +
   geom_rect(data = ebt_mds_grpd(per = paste(precision[[1]], "month")), mapping = aes(xmin = Period, xmax = Period + months(precision[[1]]), ymin = 0, ymax = EntRt, fill = EntRt)) +
   scale_x_date(date_minor_breaks = "1 year", expand = c(.01, .01)) +
   scale_y_continuous(expand = c(.02, .02)) +
-  scale_fill_fermenter(palette = "BuPu", direction = 1,
+  scale_fill_fermenter(name = "Entry Rate", palette = "BuPu", direction = 1,
                        breaks = c(0, 25, 75, 175, 225), 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
