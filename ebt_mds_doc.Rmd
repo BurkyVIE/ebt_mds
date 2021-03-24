@@ -270,7 +270,7 @@ ebt_mds_full %>%
 
 ```
 
-Plot of last 21 streaks:
+Plot of last 21 hit streaks:
 
 ```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
