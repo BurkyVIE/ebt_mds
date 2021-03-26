@@ -279,7 +279,7 @@ dat0 <- semi_join(tmp, dat) %>% mutate(Mid = as_date(From  + as.duration(interva
 
 p <- ggplot() +
   geom_rect(data = dat, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
-  geom_point(data = dat0, mapping = aes(x = Mid, y = Hits/Days), color = "red", size = 2, shape = 8) +
+  geom_rect(data = dat0, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days), fill = NA, color = "grey25") +
   scale_x_date(name = "Time", date_labels = "%m/%Y", expand = c(.01, .01)) +
   scale_y_continuous(name = "Hits per Day", expand = c(.02, .02)) +
   scale_fill_viridis_c(name = "Hit ratio", direction = -1, begin = .05, end = .95) +
