@@ -4,10 +4,20 @@ source("ebt_mds.txt") # Einlesen des minimal Dataset
 source("ebt_mds_grpd.r") # Funktion zum Gruppieren
 
 ebt_mds_full <-
-  ebt_mds_grpd(per = "day", grp_nm = "Date", reverse = TRUE) %>% 
+  ebt_mds_grpd(per = "day", grp_nm = "Date", reverse = FALSE) %>% 
   select(-Days, -EntRt, -LocRt, -ERPctl, -LRPctl) %>% # Beide Ableitungen entstehen durch Division durch 1
   mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))) %>% # Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
-  relocate(Day, .after = Loc)
+  relocate(Day, .after = Loc) %>% 
+  add_column(HitStreak = (.$Hits > 0) %>% rle() %>% # ab hier für HitStreak
+               `[[`(1) %>%
+               rep(1:length(.), .)) %>% 
+  mutate(HitStreak = paste(ceiling(HitStreak / 2),
+                        case_when(Hits == 0 ~ "inactive",
+                                  TRUE ~ "active"),
+                        (Hits == 0) %>% rle() %>% `[[`(1) %>% sapply(., seq) %>% unlist(),
+                        sep ="-")) %>%
+  arrange(desc(Date)) %>% 
+  relocate(AvPctl, .after = Avg)
 
 
 
