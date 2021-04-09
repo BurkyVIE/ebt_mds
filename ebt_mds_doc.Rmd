@@ -262,10 +262,23 @@ ebt_mds_full %>%
   mutate(Type = case_when(Hits == 0 ~ "inactive",
                           TRUE ~ "active")) %>% 
   filter(Type == "active") -> streaks
+
   streaks %>% 
     arrange(desc(Days), HitRt) %>% 
     filter(Days >= nth_max(Days, 5)) %>% 
     select(-Type) -> tmp
+
+    # for later plots
+  dat <- streaks %>% arrange(From) %>% tail(21)
+  dat0 <- semi_join(tmp, dat) %>%
+    mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2)) %>% 
+    rowid_to_column(var = "#") %>% 
+    mutate(`#` = letters[`#`])
+  
+  tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
+    replace_na(list(`#`= "")) %>% 
+    relocate(`#`)
+  
   knitr::kable(tmp, format.args = list(big.mark = ','))
 
 ```
@@ -274,15 +287,13 @@ Plot of last 21 hit streaks:
 
 ```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
-dat <- streaks %>% arrange(From) %>% tail(21)
-dat0 <- semi_join(tmp, dat) %>% mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2))
-
 p <- ggplot() +
   geom_rect(data = dat, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
   geom_rect(data = dat0, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days), fill = NA, color = "grey25") +
+  geom_text(data = dat0, mapping = aes(x = To - days(2), y = Hits/Days + .15, label = `#`)) +
   scale_x_date(name = "Time", date_labels = "%m/%Y", expand = c(.01, .01)) +
   scale_y_continuous(name = "Hits per Day", expand = c(.02, .02)) +
-  scale_fill_viridis_c(name = "Hit ratio", direction = -1, begin = .05, end = .95) +
+  scale_fill_viridis_c(name = "Hit Ratio", direction = -1, begin = .05, end = .95) +
   theme_minimal()
 
 plot(p)
