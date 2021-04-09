@@ -268,7 +268,7 @@ ebt_mds_full %>%
     filter(Days >= nth_max(Days, 5)) %>% 
     select(-Type) -> tmp
 
-    # for later plots
+  # for later plots
   dat <- streaks %>% arrange(From) %>% tail(21)
   dat0 <- semi_join(tmp, dat) %>%
     mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2)) %>% 
