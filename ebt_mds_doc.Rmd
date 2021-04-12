@@ -293,7 +293,7 @@ ebt_mds_full %>%
     mutate(`#` = letters[`#`])
   
   tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
-    replace_na(list(`#`= "")) %>% 
+    replace_na(list(`#`= "&#0000;")) %>% # Null symbol
     relocate(`#`)
   
   knitr::kable(tmp, format.args = list(big.mark = ','))
