@@ -192,7 +192,7 @@ p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) +
   geom_smooth(color = colors[2], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
   scale_x_date(name = "Time", date_breaks = "2 years", date_labels = "%Y", expand = c(.01, .01)) +
   scale_y_continuous(name = "", expand = c(.02, .02)) +
-  scale_color_manual(values = c("old" = colors[5], "recent" = colors[7])) +
+  scale_color_manual(values = c("old" = colors[5], "recent" = colors[6])) +
   facet_wrap(~ What, scales = "free_y", ncol = 2) +
   theme_minimal()
 
