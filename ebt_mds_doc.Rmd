@@ -219,7 +219,7 @@ ebt_deno %>% select(-Date) %>%
   mutate(Val = substr(Denom, 2, 4) %>% as.integer(),
          Denom = factor(Denom, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
                                  stringr::str_pad(., width = 3, side = "left") %>% 
-                                 paste0("&#8364; ", .)), # EURO symbol
+                                 paste0("\u20ac ", .)), # EURO symbol
          Value = Count * Val,
          C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
          V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
@@ -236,7 +236,7 @@ ebt_deno %>%
   group_by(Year = lubridate::year(Date)) %>% 
   summarise(across(.cols = `E005`:`E500`, .fns = sum), .groups = "drop") %>% 
   pivot_longer(cols = `E005`:`E500`, names_to = "Denom", values_to = "Count") %>% 
-  mutate(Denom = factor(Denom, labels = paste0("â‚¬ ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp
+  mutate(Denom = factor(Denom, labels = paste0("\u20ac ", c(5, 10, 20, 50, 100, 200, 500))))-> tmp # EURO symbol
 
 p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denom)) +
   geom_bar(mapping = aes(fill = Denom), stat = "identity") +
@@ -292,7 +292,7 @@ ebt_mds_full %>%
     mutate(`#` = letters[`#`])
   
   tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
-    replace_na(list(`#`= "&#0000;")) %>% # Null symbol
+    replace_na(list(`#`= "&#0000;")) %>% # Null symbol (HTML)
     relocate(`#`)
   
   knitr::kable(tmp, format.args = list(big.mark = ','))
