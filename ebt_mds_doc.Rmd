@@ -99,7 +99,7 @@ The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")
 
 ## Yearly Activity
 
-Entries throughout the year:
+Entries throughout each year:
 
 ```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
