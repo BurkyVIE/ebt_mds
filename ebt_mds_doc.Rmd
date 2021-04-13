@@ -219,7 +219,7 @@ ebt_deno %>% select(-Date) %>%
   mutate(Val = substr(Denom, 2, 4) %>% as.integer(),
          Denom = factor(Denom, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
                                  stringr::str_pad(., width = 3, side = "left") %>% 
-                                 paste0("â‚¬ ", .)),
+                                 paste0("&#8364; ", .)), # EURO symbol
          Value = Count * Val,
          C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
          V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
