@@ -56,9 +56,9 @@ stat <- ebt_mds_full %>% summarise(across(.cols = Count:Hits, .fns = ~ sum(., na
   )
 ```
 
-Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occured on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
+Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occurred on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
 **`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`).\
-**`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occured (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).\
+**`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occurred (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).\
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
 \pagebreak
