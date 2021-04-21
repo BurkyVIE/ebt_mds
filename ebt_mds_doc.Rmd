@@ -28,7 +28,7 @@ ebt_mds_full <-
          Value = map_dbl(.x = Deno, .f = ~ (t(.) %*% c(5L, 10L, 20L, 50L, 100L, 200L, 500L)) %>% as.integer()),
          nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
   select(Date, Day, Deno, Count, Value, Hits, Loc, nLoc)
-# Immer englische Abk?rzungen f?r die Wochentage verwenden [wday() nimmt aus locale()]
+# Immer englische Abkuerzungen fuer die Wochentage verwenden [wday() nimmt aus locale()]
 levels(ebt_mds_full$Day) <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 ```
 
