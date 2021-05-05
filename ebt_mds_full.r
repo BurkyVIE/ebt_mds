@@ -11,12 +11,12 @@ ebt_mds_full <-
 
 # Funktion zur Erstellung eines streak (x ... welche Variable, a ... Stellen No, b ... Stellen Cons)
 streak <- function(x, a, b){
-  No <- rle(x > 0) %>% `[[`(1) %>% rep(1:length(.), .) %>% `/`(2) %>% ceiling()
+  No <- rle(x > 0) %>% `[[`(1) %>% rep(1:length(.), .) %>% `/`(2) %>% ceiling() # Immer Paare mit gleicher Nummer
   Type <- rep("active", length(x))
   Type[x == 0] <- "inactv"
   Cons <- rle(x == 0) %>% `[[`(1) %>% sapply(., seq) %>% unlist()
   
-  a <- paste0("%0", a, "d")
+  a <- paste0("%0", a, "d") # Definition der Formats (fmt) fuer nachfolgendes sprintf
   b <- paste0("%0", b, "d")
   
   cbind(Type, "_", sprintf(a, No), " #", sprintf(b, Cons)) %>% apply(., 1, paste, collapse = "") %>%
