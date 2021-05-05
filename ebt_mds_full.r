@@ -29,6 +29,8 @@ ebt_mds_full <- ebt_mds_full %>%
          HitStreak = streak(Hits, 4, 2)) %>% 
   arrange(desc(Date))
 
+rm(streak)
+
 
 
 # Kennzahlen
