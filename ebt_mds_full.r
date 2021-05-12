@@ -83,12 +83,8 @@ rm(tmp)
 # OR
 #
 # ebt_mds_full %>% 
-#   bind_cols(
-#     ebt_mds_full$Deno %>%
-#       do.call(rbind, .) %>%
-#       as_tibble(.name_repair = "minimal") %>%
-#       setNames(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))
-#   )
+#   select(Date, Deno) %>% 
+#   transmute(Date, map_dfr(Deno, ~ set_names(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))))
 
 
 
