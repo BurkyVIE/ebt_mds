@@ -82,7 +82,7 @@ rm(tmp)
 #
 # OR
 #
-# ebt_mds %>% 
+# ebt_mds_full %>% 
 #   bind_cols(
 #     ebt_mds_full$Deno %>%
 #       do.call(rbind, .) %>%
