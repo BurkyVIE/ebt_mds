@@ -82,7 +82,7 @@ rm(tmp)
 #
 # OR
 #
-# ebt_mds_full %>% 
+# ebt_mds_grpd(per = "3 month") %>% 
 #   select(Date, Deno) %>% 
 #   transmute(Date, map_dfr(Deno, ~ set_names(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))))
 
