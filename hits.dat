@@ -100,4 +100,4 @@ png(paste0(EBT_global$whereis, "/spec/dotmap.png"), width = 34, height = 21.5 ,u
 plot(p)
 dev.off()
 
-rm(map_at, grid,  grid_at, grid_bills, id_at, p)
+rm(map_at, grid,  grid_at, locs_bills, grid_bills, id_at, p)
