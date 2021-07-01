@@ -74,9 +74,8 @@ ggplot() +
   theme_minimal()
 
 # locs to dots
-grid_bills <- st_join(grid_at, locs_bills, join = st_covers) %>% 
-  group_by(ID) %>% 
-  summarise(Count = sum(Count))
+grid_bills <- st_join(grid_at, locs_bills, join = st_covers %>% 
+  aggregate(list(.$ID), sum)
 
 ### TEST
 ggplot() +
