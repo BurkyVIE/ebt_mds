@@ -4,8 +4,8 @@ ebt_grpd <- ebt_mds_grpd(period = "month") # Daten für den Plot
 
 p <- ebt_grpd  %>%
   mutate(across(c(Count, Value, Hits), .fns = ~ (. / Days))) %>% # Berechnungen für pro Tag
+  select(Period, Hits, Count, Value, nLoc, Avg, HitRt) %>% 
   mutate(Color = c(rep("old", n() - 1), "recent")) %>%
-  select(-Deno, -Loc, -(EntRt:LRPctl)) %>% 
   # Überführen der Spalten in eine Variable
   pivot_longer(Hits:HitRt, names_to = "What", values_to = "Count") %>% 
   # Festlegen der Reihenfolge der Plots
