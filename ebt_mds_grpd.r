@@ -46,16 +46,19 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
     group_by(!!grouping) %>% 
     # Zusammenfassen entsprechend Periode
     summarise(Deno = list(Reduce(`+`, Deno)),
+              Vals = map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .) %>% as.integer()),
               Loc = list(Reduce(union, Loc)),
               Days = n(),
               Hits = sum(Hits, na.rm = TRUE),
               .groups = "drop")
   # Diverse Ableitungen
   tmp <- tmp %>% 
-    mutate(Count = map_int(.x = Deno, .f = ~ sum(.)),
-           Value = map_int(.x = Deno, .f = ~ (t(.) %*% c(5, 10, 20, 50, 100, 200, 500)) %>% as.integer()),
+    mutate(Count = map_int(.x = Vals, .f = ~ length(.)),
+           Value = map_int(.x = Vals, .f = ~ sum(.)),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
+           Median = map_dbl(.x = Vals, .f = ~ median(.)),
            Avg = Value / Count,
+           SD = map_dbl(.x = Vals, .f = ~ sd(.)),
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
