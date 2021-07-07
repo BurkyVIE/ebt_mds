@@ -62,8 +62,10 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
-           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgeführt wird
-           across(.cols = AvPctl:LRPctl, .fns = ~ ecdf(.)(.)))           # Tatsächliche Berechnung
+           AvPctl = Avg %>% ecdf(.)(.),
+           HRPctl = HitRt %>% ecdf(.)(.),
+           ERPctl = EntRt %>% ecdf(.)(.),
+           LRPctl = LocRt %>% ecdf(.)(.))
   
   # Labels
    if(period == "weekday") {
