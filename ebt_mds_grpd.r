@@ -52,21 +52,18 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
               .groups = "drop")
   # Diverse Ableitungen
   tmp <- tmp %>% 
-    mutate(Vals = map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .) %>% as.integer()),
-           Count = map_int(.x = Vals, .f = ~ length(.)),
-           Value = map_int(.x = Vals, .f = ~ sum(.)),
-           nLoc = map_int(.x = Loc, .f = ~ length(.)),
-           Avg = Value / Count,
-           SD = map_dbl(.x = Vals, .f = ~ sd(.)),
-           Median = map_dbl(.x = Vals, .f = ~ median(.)),
+    mutate(map2_df(map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), Loc, # map2 1) expandierte Denos und 2) Locations
+                   ~data.frame(Count = length(.x),                                      # mappe eine Reihe von Funktionen gleichzeitig
+                               Value = as.integer(sum(.x)),
+                               nLoc = length(.y),
+                               Avg = mean(.x),
+                               Med = median(.x),
+                               SD = sd(.x))),
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
-           AvPctl = ecdf(Avg)(Avg),
-           HRPctl = ecdf(HitRt)(HitRt),
-           ERPctl = ecdf(EntRt)(EntRt),
-           LRPctl = ecdf(LocRt)(LocRt)) %>%
-    select(-Vals)
+           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgeführt wird
+           across(.cols = AvPctl:LRPctl, .fns = ~ ecdf(.)(.)))           # Tatsächliche Berechnung
   
   # Labels
    if(period == "weekday") {
