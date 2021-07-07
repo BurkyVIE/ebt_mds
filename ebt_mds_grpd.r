@@ -53,12 +53,12 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
   # Diverse Ableitungen
   tmp <- tmp %>% 
     mutate(map2_df(map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), Loc, # map2 1) expandierte Denos und 2) Locations
-                   ~data.frame(Count = length(.x),                                      # mappe eine Reihe von Funktionen gleichzeitig
-                               Value = as.integer(sum(.x)),
-                               nLoc = length(.y),
-                               Avg = mean(.x),
-                               Med = median(.x),
-                               SD = sd(.x))),
+                   ~ data.frame(Count = length(.x),                                      # mappe eine Reihe von Funktionen gleichzeitig
+                                Value = as.integer(sum(.x)),
+                                nLoc = length(.y),
+                                Avg = mean(.x),
+                                Med = median(.x),
+                                SD = sd(.x))),
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
