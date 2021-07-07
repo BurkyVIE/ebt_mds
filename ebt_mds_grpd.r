@@ -49,11 +49,11 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
               Loc = list(Reduce(union, Loc)),
               Days = n(),
               Hits = sum(Hits, na.rm = TRUE),
-              .groups = "drop") %>% 
-    mutate(Vals = map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .) %>% as.integer()))
+              .groups = "drop")
   # Diverse Ableitungen
   tmp <- tmp %>% 
-    mutate(Count = map_int(.x = Vals, .f = ~ length(.)),
+    mutate(Vals = map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .) %>% as.integer()),
+           Count = map_int(.x = Vals, .f = ~ length(.)),
            Value = map_int(.x = Vals, .f = ~ sum(.)),
            nLoc = map_int(.x = Loc, .f = ~ length(.)),
            Avg = Value / Count,
