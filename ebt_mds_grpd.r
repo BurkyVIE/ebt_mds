@@ -69,26 +69,29 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
     select(-Vals)
   
   # Labels
-  if(period == "weekday") {
+   if(period == "weekday") {
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
   }
   if(period == "month") {
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = Loc)
   }
-  if(period == "2 month") {
+  if(period %in% c("2 month", "2 months")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(!!grouping) - 1) %/% 2 + 1, "/6")) %>% relocate(Label, .after = Loc)
   }
   if(period %in% c("quarter", "3 month")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " Q", quarter(!!grouping))) %>% relocate(Label, .after = Loc)
   }
-  if(period == "4 month") {
+  if(period %in% c("4 month", "4 months")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(!!grouping) - 1) %/% 4 + 1, "/3")) %>% relocate(Label, .after = Loc)
   }
-  if(period %in% c("halfyear", "6 month")) {
+  if(period %in% c("halfyear", "6 month", "6 months")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " / ", c("I", "II")[semester(!!grouping)])) %>% relocate(Label, .after = Loc)
   }
   if(period == "year") {
-    tmp <- tmp %>% mutate(Label = (year(!!grouping))) %>% relocate(Label, .after = Loc)
+    tmp <- tmp %>% mutate(Label = year(!!grouping)) %>% relocate(Label, .after = Loc)
+  }
+  if(period %in% c("10 year", "10 years")) {
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   }
   
   # Umkehren der Reihenfolge (letzte oben)
