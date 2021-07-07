@@ -65,7 +65,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
            AvPctl = ecdf(Avg)(Avg),
            HRPctl = ecdf(HitRt)(HitRt),
            ERPctl = ecdf(EntRt)(EntRt),
-           LRPctl = ecdf(LocRt)(LocRt))
+           LRPctl = ecdf(LocRt)(LocRt)) %>%
+    select(-Vals)
   
   # Labels
   if(period == "weekday") {
