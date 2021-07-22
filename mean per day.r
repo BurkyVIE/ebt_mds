@@ -9,13 +9,13 @@ p <- ebt_mds_full %>%
             SD = sd(Count)) %>% 
   mutate(V = SD / Avg,
          teco = case_when(Avg <= 100 ~ "white", # text color; for dark backgrounds (tiles) use lighter colors
-                           TRUE ~ "black")) %>% 
+                          TRUE ~ "black")) %>% 
   separate(MoDa, into = c("Month", "Day")) %>% 
   ggplot(mapping = aes (x = Day, y = Month)) +
   geom_tile(mapping = aes(fill = Avg), color = "black") +
   geom_text(mapping = aes(color = teco,
                           label = paste0(format(Total, big.mark = " "), " / ", n, "\n= ",
-                                         format(round(Avg, 1), nsmall = 1), "\n(± ",
+                                         format(round(Avg, 1), nsmall = 1), "\n(Â± ",
                                          format(round(SD, 1), nsmall = 1), ")")), size = 2) +
   scale_fill_fermenter(name = "Average Value",
                        palette = "Purples",
