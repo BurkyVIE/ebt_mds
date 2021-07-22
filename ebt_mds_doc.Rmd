@@ -285,7 +285,7 @@ ebt_mds_full %>%
     select(-Type) -> tmp
 
   # for later plots
-  dat <- streaks %>% arrange(From) %>% tail(21)
+  dat <- streaks %>% arrange(From) %>% tail(5)
   dat0 <- semi_join(tmp, dat) %>%
     mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2)) %>% 
     rowid_to_column(var = "#") %>% 
@@ -299,7 +299,7 @@ ebt_mds_full %>%
 
 ```
 
-Plot of the 21 most recent hit streaks:
+Plot of the five most recent hit streaks:
 
 ```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
 
