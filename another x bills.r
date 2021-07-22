@@ -11,7 +11,8 @@ with(ebt_mds_grpd(per = "day", grp_nm = "Date"),
   ggplot(mapping = aes(x = Diff)) +
   geom_histogram(fill = "purple3", color = "purple", binwidth = x/2e3*1.5, size = 1.25) +
   geom_boxplot(mapping = aes(y = 1/2), color = "navy", fill = "lightblue", size = 1.25, alpha = .75) +
-  labs(title = paste0("Time to Enter Another ", format(x, big.mark = ","), " Bills")) +
+  labs(title = paste0("EuroBillTracker - Time to Enter Another ", format(x, big.mark = ","), " Bills"),
+       subtitle = "by Burky") +
   xlab("Days") +
   ylab("Count") +
   theme_ebt() -> p
