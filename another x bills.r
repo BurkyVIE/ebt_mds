@@ -4,7 +4,7 @@ x <- 5e4  # another x bills
 
 with(ebt_mds_grpd(per = "day", grp_nm = "Date"),
      rep(Date, Count)) %>% 
-  `[`(1:(length(.) %/% x) * x) %>% 
+  `[`(0:(length(.) %/% x) * x + 1) %>% 
   diff() %>% 
   as.numeric() %>% 
   as_tibble_col(., column_name = "Diff") %>% 
