@@ -12,9 +12,9 @@ with(ebt_mds_grpd(per = "day", grp_nm = "Date"),
   geom_histogram(fill = "purple3", color = "purple", binwidth = x/2e3*1.5, size = 1.25) +
   geom_boxplot(mapping = aes(y = 1/2), color = "navy", fill = "lightblue", size = 1.25, alpha = .75) +
   labs(title = paste0("EuroBillTracker - Time to Enter Another ", format(x, big.mark = ","), " Bills"),
-       subtitle = "by Burky") +
-  xlab("Days") +
-  ylab("Count") +
+       subtitle = "by Burky",
+       x = "Days",
+       y = "Count") +
   theme_ebt() -> p
 
 windows(16, 9)
