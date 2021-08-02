@@ -26,7 +26,7 @@ p <- ebt_mds_full %>%
   scale_color_identity() +
   scale_x_discrete(position = "top") +
   scale_y_discrete(limits = rev) +
-  labs(title = "EuroBillTracker - Daiyl Entries",
+  labs(title = "EuroBillTracker - Daily Entries",
        subtitle = "by Burky") +
   theme_ebt()
 
