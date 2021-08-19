@@ -71,6 +71,9 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
    if(period == "weekday") {
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
   }
+  if(period == "week") {
+    tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-W%V")) %>% relocate(Label, .after = Loc)
+  }
   if(period == "month") {
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = Loc)
   }
