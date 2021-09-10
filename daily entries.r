@@ -5,9 +5,9 @@ colors = colorRampPalette(c("purple", "white"))(6)[c(1, 3:5)] %>%
   setNames(., c("Median", "30 %", "60 %", "90 %"))
 
 ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
-  mutate(MoDa = strftime(Date, "2000-%m-%d") %>% as.Date()) %>% 
-  select(MoDa, nLoc, Count, Value, Hits) %>%
-  nest(data = -MoDa) %>%
+  mutate(Date0 = strftime(Date, "2000-%m-%d") %>% as.Date()) %>% 
+  select(Date0, nLoc, Count, Value, Hits) %>%
+  nest(data = -Date0) %>%
   mutate(map_dfr(data, ~ with(., c(
     Q = quantile(Count, .05),
     Q = quantile(Count, .2),
