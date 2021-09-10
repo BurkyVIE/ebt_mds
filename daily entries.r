@@ -1,7 +1,8 @@
 library(tidyverse)
 library(lubridate)
 
-colors = colorRampPalette(c("purple", "white"))(6)[c(1, 3:5)] %>% 
+# colors = colorRampPalette(c("purple", "white"))(6)[c(1, 3:5)] %>% 
+colors = colorRampPalette(c("navy", "cornflowerblue", "white"))(6)[c(1, 3:5)] %>% 
   setNames(., c("Median", "30 %", "60 %", "90 %"))
 
 ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
