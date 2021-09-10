@@ -26,7 +26,7 @@ ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
                breaks = paste(2000, seq(1, 12, by = 2), 1, sep = "-") %>% as.Date(),
                date_labels = "%b",
                expand = c(0, 0)) +
- scale_y_continuous(name = "",
+ scale_y_sqrt(name = "",
                      expand = c(.01, .01)) +
   scale_fill_manual(name = "", values = colors) +
   scale_color_manual(name = "", values = colors) +
