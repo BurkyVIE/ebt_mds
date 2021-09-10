@@ -5,7 +5,7 @@ colors = colorRampPalette(c("purple", "white"))(6)[c(1, 3:5)] %>%
   setNames(., c("Median", "30 %", "60 %", "90 %"))
 
 ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
-  mutate(MoDa = str_sub(Date, 6, 10)) %>%
+  mutate(MoDa = strftime(Date, "2000-%m-%d") %>% as.Date()) %>% 
   select(MoDa, nLoc, Count, Value, Hits) %>%
   nest(data = -MoDa) %>%
   mutate(map_dfr(data, ~ with(., c(
@@ -17,7 +17,6 @@ ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
     Q = quantile(Count, .8),
     Q = quantile(Count, .95)
   )))) %>% 
-  mutate(Date0 = ymd(paste(2000, MoDa, sep = "-"))) %>% 
   ggplot(aes(x = Date0, y = Median)) +
   geom_ribbon(aes(ymin = `Q.5%`, ymax = `Q.95%`, fill = "90 %")) +
   geom_ribbon(aes(ymin = `Q.20%`, ymax = `Q.80%`, fill = "60 %")) +
