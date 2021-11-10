@@ -9,8 +9,9 @@ with(ebt_mds_grpd(per = "day", grp_nm = "Date"),
   as.numeric() %>% 
   as_tibble_col(., column_name = "Diff") %>% 
   ggplot(mapping = aes(x = Diff)) +
-  geom_histogram(fill = "purple", color = "purple3", binwidth = x/2e3*1.5, size = 1.25) +
-  geom_boxplot(mapping = aes(y = .25), width = .2, color = "navy", fill = "white", size = 1.25, alpha = .75) +
+  geom_histogram(fill = "lightblue", color = "navy", binwidth = x/2e3*1.5, size = 1.25) +
+  geom_boxplot(mapping = aes(y = .25), width = .2, color = "white", fill = "white", size = 2.5, alpha = .75) +
+  geom_boxplot(mapping = aes(y = .25), width = .2, color = "purple3", fill = NA, size = 1.25) +
   labs(title = paste0("EuroBillTracker - Time to Enter Another ", format(x, big.mark = ","), " Bills"),
        subtitle = "by Burky",
        x = "Days",
