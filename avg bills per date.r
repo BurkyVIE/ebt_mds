@@ -16,8 +16,10 @@ norm <- dnorm(xseq, normpar[1], normpar[2])
 norm <- tibble(x = xseq, y = norm / max(norm))
 
 ggplot(data = dat, mapping = aes(x = Avg)) +
-  geom_line(data = norm, aes(x = x, y = y), size = 1.25, linetype = "dashed") + 
-  geom_text(x = normpar[1], y = 1.025, aes(label = paste0("N(", format(normpar[1], digits = 1, nsmall = 1), ", ", format(normpar[2], digits = 1, nsmall = 1), ")"))) +
+  geom_line(data = norm, aes(x = x, y = y), size = 1.25, linetype = "dashed", color = "purple3") + 
+  geom_text(aes(x = normpar[1], y = 1.025,
+                label = paste0("N(", format(normpar[1], digits = 1, nsmall = 1), ", ", format(normpar[2], digits = 1, nsmall = 1), ")")),
+            color = "purple3") +
   geom_density(mapping = aes(y = after_stat(scaled)), fill = "lightblue", color = "navy", alpha = .9) +
   geom_jitter(mapping = aes(y = -.2), height = .11, pch = 21, color = "navy", fill = "lightblue") +
   geom_boxplot(mapping = aes(y = -.04), width = .06, color = "navy", size = 1.25) +
