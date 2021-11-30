@@ -24,7 +24,7 @@ p <- ebt_mds_full %>%
   #                                                barheight = .75,
   #                                                even.steps = FALSE)) +
   scale_fill_viridis_b(name = "Average Value",
-                       option = "plasma",
+                       option = "viridis",
                        breaks = c(50, 100, 125, 150, 175, 255), 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
