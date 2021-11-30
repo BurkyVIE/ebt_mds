@@ -17,8 +17,14 @@ p <- ebt_mds_full %>%
                           label = paste0(format(Total, big.mark = " "), " / ", n, "\n= ",
                                          format(round(Avg, 1), nsmall = 1), "\n(± ",
                                          format(round(SD, 1), nsmall = 1), ")")), size = 2) +
-  scale_fill_fermenter(name = "Average Value",
-                       palette = "Purples",
+  # scale_fill_fermenter(name = "Average Value",
+  #                      palette = "Purples",
+  #                      breaks = c(50, 100, 125, 150, 175, 255), 
+  #                      guide = guide_coloursteps(barwidth = 25,
+  #                                                barheight = .75,
+  #                                                even.steps = FALSE)) +
+  scale_fill_viridis_b(name = "Average Value",
+                       option = "plasma",
                        breaks = c(50, 100, 125, 150, 175, 255), 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
