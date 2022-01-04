@@ -41,17 +41,17 @@ box <- (c(-12 + (53 - xtra) * 66/157, 29 + (64 - xtra) * 42/150, -12 + (68 + xtr
   st_sfc(crs = 4326)
 rm(xtra)
 
+# Data reduction
+map_world <- st_intersection(map_world, box)
+grid <- st_intersection(grid, box)
+locs <- st_intersection(locs, box)
+
 # Dots mit Location
 been <- st_intersection(grid, locs) %>%
   group_by(ID) %>%
   count()
 visited <- st_intersection(box, grid %>% filter(ID %in% been$ID))
 rm(been)
-
-# Data reduction
-map_world <- st_intersection(map_world, box)
-grid <- st_intersection(grid, box)
-locs <- st_intersection(locs, box)
 
 # Seperate at and non-at locs
 locs <- locs %>% mutate(Origin = case_when(Country == "Austria" ~ "AT",
