@@ -1,7 +1,7 @@
 library(tidyverse)
 library(lubridate)
 
-precision <- list(12/3, "Third") # list(12/2, "Half") list(12/3, "Thirds") list(12/4, "Quarter") list(12/6, "Sixth")
+precision <- list(12/3, "Third") # list(12/2, "Half") list(12/3, "Third") list(12/4, "Quarter") list(12/6, "Sixth")
 
 ggplot() +
   geom_rect(data = ebt_mds_grpd(per = paste(precision[[1]], "month")), mapping = aes(xmin = Period, xmax = Period + months(precision[[1]]), ymin = 0, ymax = EntRt, fill = EntRt)) +
