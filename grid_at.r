@@ -60,4 +60,4 @@ windows(16,9)
 plot(p)
 
 # clean-up ----
-rm(cols, map_eu, box, grid, mapngrid, locs, visited)
+rm(cols, map_eu, box, grid, mapngrid, locs, visited, p)
