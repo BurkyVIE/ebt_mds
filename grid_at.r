@@ -60,7 +60,7 @@ p <- ggplot() +
   coord_sf(crs = st_crs(3416)) +
   theme_ebt()
 
-windows(16,9)
+windows(15,9)
 plot(p)
 
 # clean-up ----
