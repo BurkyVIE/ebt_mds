@@ -44,7 +44,7 @@ box <- st_bbox(grid) %>%
   st_as_sfc(crs = 4326)
 
 ## Crop- Data reduction ----
-mapngrid <- st_intersection(map_eu[box,], grid) #map plus grid because double lines otherwise after transformation
+mapngrid <- st_intersection(grid, map_eu[box,]) #map plus grid because double lines otherwise after transformation
 locs <- locs[grid,] # faster than st_crop(locs, grid)
 
 # Plot ----
