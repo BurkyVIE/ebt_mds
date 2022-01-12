@@ -49,7 +49,7 @@ p <- ggplot() +
   geom_sf(data = mapngrid, color = cols[3], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
   geom_sf(data = visited, color = NA, fill = cols[1], alpha = 1/5) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
-  geom_sf(data = locs, color = cols[4], size = 7/4, alpha = 1/2) +
+  geom_sf(data = locs, color = cols[4], size = 5/4, alpha = 1/3) +
   scale_x_continuous(expand = c(.01, .01)) +
   scale_y_continuous(expand = c(.01, .01)) +
   labs(title = "Dots and Locations In and Around AT",
