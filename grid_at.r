@@ -8,7 +8,7 @@ library(sf)
 cols <- viridis::viridis(4, direction = -1, begin = 2/10)
 
 ## enlarge raster ----
-i <- 1
+i <- 5
 
 # initialization ----
 ## EBT-Grid of/around austria (based on europe-grid) ----
@@ -49,8 +49,9 @@ locs <- locs[grid,] # faster than st_crop(locs, grid)
 
 # Plot ----
 p <- ggplot() +
+  geom_sf(data = grid, fill = cols[3]) +
+  geom_sf(data = mapngrid, color = cols[3], fill = rgb(221, 226, 233, maxColorValue = 255)) +
   geom_sf(data = visited, color = NA, fill = cols[1], alpha = 1/5) +
-  geom_sf(data = mapngrid, color = cols[3], fill = NA) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
   geom_sf(data = locs, color = cols[4], size = 7/4, alpha = 1/2) +
   scale_x_continuous(expand = c(.01, .01)) +
@@ -60,8 +61,11 @@ p <- ggplot() +
   coord_sf(crs = st_crs(3416)) +
   theme_ebt()
 
-windows(15,9)
+windows(15, 9)
 plot(p)
+# pdf("grid_at.pdf", paper = "a4r", width = 210, height = 297)
+# plot(p)
+# dev.off()
 
 # clean-up ----
 rm(cols, map_eu, box, grid, mapngrid, locs, visited, p)
