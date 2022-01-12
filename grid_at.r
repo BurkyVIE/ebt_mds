@@ -8,7 +8,7 @@ library(sf)
 cols <- viridis::viridis(4, direction = -1, begin = 2/10)
 
 ## enlarge raster ----
-i <- 5
+i <- 3
 
 # initialization ----
 ## EBT-Grid of/around austria (based on europe-grid) ----
@@ -39,12 +39,8 @@ visited <- st_join(grid, locs, join = st_covers) %>%
   select(-(First:Loc)) %>% # no doubles; also unique next line
   unique()
   
-## Box ----
-box <- st_bbox(grid) %>%
-  st_as_sfc(crs = 4326)
-
 ## Crop- Data reduction ----
-mapngrid <- st_intersection(grid, map_eu[box,]) #map plus grid because double lines otherwise after transformation
+mapngrid <- st_intersection(grid, map_eu[grid,]) #map plus grid because double lines otherwise after transformation
 locs <- locs[grid,] # faster than st_crop(locs, grid)
 
 # Plot ----
@@ -68,4 +64,4 @@ plot(p)
 # dev.off()
 
 # clean-up ----
-rm(cols, map_eu, box, grid, mapngrid, locs, visited, p)
+rm(cols, map_eu, grid, mapngrid, locs, visited, p)
