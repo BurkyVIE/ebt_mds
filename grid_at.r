@@ -1,4 +1,4 @@
-# libbraries ----
+# libraries ----
 library(tidyverse)
 library(rnaturalearth)
 library(sf)
