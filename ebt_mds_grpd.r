@@ -1,4 +1,4 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = day(today()), ytd_month = month(today()), period = NULL, grp_nm = "Period", reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_month = NULL, period = NULL, grp_nm = "Period", reverse = FALSE) {
   # mds_data    mds_data-artige Daten
   # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
   # ytd_day     year-to-date Tag
@@ -35,7 +35,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = day(today())
   
   # year-to-date
   if(ytd) {
-    # d <- day(today()); m <- month(today())
+    if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(), "%d"))
+    if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(), "%m"))
     d <- ytd_day; m <- ytd_month
     tmp <- tmp %>% 
       filter(month(Date) < m | (month(Date) == m & day(Date) <= d))
@@ -116,7 +117,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = day(today())
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   }
   if(ytd) {
-    tmp <- tmp %>% mutate(Label = paste0("ytd ", str_pad(ytd_day, 2, pad = "0"), "/", str_pad(ytd_month, 2, pad = "0"), "/", Label))
+    tmp <- tmp %>% mutate(Label = paste0("YTD ", str_pad(ytd_day, 2, pad = "0"), "/", str_pad(ytd_month, 2, pad = "0"), "/", Label))
   }
   
   # Umkehren der Reihenfolge (letzte oben)
