@@ -1,4 +1,9 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, period = NULL, grp_nm = "Period", reverse = FALSE) {
+  # mds_data    mds_data-artige Daten
+  # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
+  # period      gruppierende (Zeit-)Variable
+  # grp_nm      Bezeichnung im Ergebnis
+  # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
   
   # Notwendige libraries
   library(tidyverse)
@@ -8,6 +13,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
   grouping_nm = quo_name(grouping)
   
   # Auswahl der Periode 
+  if(ytd) period <- "year" # Für year-to-date
+  
   period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
   if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")]
   if(identical(period, character(0))) return(NULL)
@@ -23,7 +30,14 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) %>%
     replace_na(list(Hits = 0L)) -> tmp
-
+  
+  # year-to-date
+  if(ytd) {
+    d <- day(today()); m <- month(today())
+    tmp <- tmp %>% 
+      filter(month(Date) < m | (month(Date) == m & day(Date) <= d))
+  }
+  
   # Spezialfälle 
   skip <- FALSE
   if(period == "day") {
@@ -42,7 +56,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
   # Quasi: else-Zweig der Spezialfälle
   if(!skip) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
-
+  
   tmp <- tmp %>% 
     group_by(!!grouping) %>% 
     # Zusammenfassen entsprechend Periode
@@ -51,6 +65,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
               Days = n(),
               Hits = sum(Hits, na.rm = TRUE),
               .groups = "drop")
+  
   # Diverse Ableitungen
   tmp <- tmp %>% 
     mutate(map2_df(map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), Loc, # map2 1) expandierte Denos und 2) Locations
@@ -63,13 +78,14 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
+           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgeführt wird
            AvPctl = Avg %>% ecdf(.)(.),
            HRPctl = HitRt %>% ecdf(.)(.),
            ERPctl = EntRt %>% ecdf(.)(.),
            LRPctl = LocRt %>% ecdf(.)(.))
   
   # Labels
-   if(period == "weekday") {
+  if(period == "weekday") {
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
   }
   if(period == "week") {
@@ -96,11 +112,14 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, period = NULL, grp_nm = "Period", r
   if(period %in% c("10 year", "10 years")) {
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   }
+  if(ytd) {
+    tmp <- tmp %>% mutate(Label = paste(Label, "ytd"))
+  }
   
   # Umkehren der Reihenfolge (letzte oben)
   if(reverse) tmp <- tmp %>%
     arrange(desc(!!grouping))
-
+  
   # Rückgabe
   return(tmp)
 }
