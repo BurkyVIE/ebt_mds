@@ -1,6 +1,8 @@
 ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = day(today()), ytd_month = month(today()), period = NULL, grp_nm = "Period", reverse = FALSE) {
   # mds_data    mds_data-artige Daten
   # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
+  # ytd_day     year-to-date Tag
+  # ytd_month   year-to-date Monat
   # period      gruppierende (Zeit-)Variable
   # grp_nm      Bezeichnung im Ergebnis
   # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
