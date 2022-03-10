@@ -117,7 +117,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   }
   if(ytd) {
-    tmp <- tmp %>% mutate(Label = paste0("YTD ", str_pad(ytd_day, 2, pad = "0"), "/", str_pad(ytd_month, 2, pad = "0"), "/", Label))
+    tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(ytd_month, 2, pad = "0"), "-", str_pad(ytd_day, 2, pad = "0")))
   }
   
   # Umkehren der Reihenfolge (letzte oben)
