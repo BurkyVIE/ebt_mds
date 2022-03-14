@@ -284,12 +284,15 @@ ebt_mds_full %>%
     filter(Days >= nth_max(Days, 5)) %>% 
     select(-Type) -> tmp
 
+  # list of symbols
+  symb <- c(letters, "\u002A", "\u2020", "\u2021") # last three are asterisk, dagger, double dagger
+  
   # for later plots
-  dat <- streaks %>% arrange(From) %>% tail(5)
+  dat <- streaks %>% arrange(From) %>% tail(15)
   dat0 <- semi_join(tmp, dat) %>%
     mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2)) %>% 
     rowid_to_column(var = "#") %>% 
-    mutate(`#` = letters[`#`])
+    mutate(`#` = symb[`#`])
   
   tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
     replace_na(list(`#`= "&#0000;")) %>% # Null symbol (HTML)
