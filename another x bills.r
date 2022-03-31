@@ -40,16 +40,12 @@ he <- ebt_mds_full %>%
   filter(D_Hts < 0 | D_Cnt < 0 | D_Val < 0) %>% 
   add_row(Date = lubridate::ymd("2004-8-3"), D_Cnt = -1, D_Val = -1, D_Hts = -1, .before = 1)
 
-Cnt <- he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt")
-Val <- he %>% filter(D_Val < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val")
-Hts <- he %>% filter(D_Hts < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")
-
-x[1:2] <- paste0(x[1:2] / 1000, "k")
-
-bind_rows(Cnt, Val, Hts) %>% 
-  mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1], " Bills"), paste0(x[2], " Euro"), paste0(x[3], " Hits")))) %>% 
+bind_rows(he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
+          he %>% filter(D_Val < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
+          he %>% filter(D_Hts < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
+  mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1] / 1e3, "k Bills"), paste0(x[2] / 1e3, "k Euro"), paste0(x[3], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
-  geom_histogram(binwidth = 30, show.legend = FALSE) +
+  geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
   geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2, alpha = .75) +
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Accent") +
@@ -63,4 +59,4 @@ bind_rows(Cnt, Val, Hts) %>%
 
 windows(16, 9)
 plot(p)
-rm(x, he, Cnt, Val, Hts, p)
+rm(x, he, p)
