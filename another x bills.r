@@ -50,7 +50,7 @@ bind_rows(Cnt, Val, Hts) %>%
   mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1], " Bills"), paste0(x[2], " Euro"), paste0(x[3], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, show.legend = FALSE) +
-  geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2.5, alpha = .75) +
+  geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2, alpha = .75) +
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Accent") +
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
