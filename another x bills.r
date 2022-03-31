@@ -53,6 +53,7 @@ bind_rows(Cnt, Val, Hts) %>%
   geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2.5, alpha = .75) +
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Accent") +
+  scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
   labs(title = paste0("EuroBillTracker - Time to Enter Another ..."),
        subtitle = "by Burky",
        x = "Days",
