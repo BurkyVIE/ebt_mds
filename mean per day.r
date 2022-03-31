@@ -19,7 +19,7 @@ p <- ebt_mds_full %>%
                                          format(round(SD, 1), nsmall = 1), ")")), size = 2) +
   # scale_fill_fermenter(name = "Average Value",
   #                      palette = "Purples",
-  #                      breaks = c(0, 100, 125, 150, 175, Inf), 
+  #                      breaks = c(0, 100, 125, 150, 175, 200, Inf), 
   #                      guide = guide_coloursteps(barwidth = 25,
   #                                                barheight = .75,
   #                                                even.steps = FALSE)) +
