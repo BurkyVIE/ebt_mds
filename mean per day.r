@@ -25,7 +25,7 @@ p <- ebt_mds_full %>%
   #                                                even.steps = FALSE)) +
   scale_fill_viridis_b(name = "Average Count",
                        option = "viridis",
-                       breaks = c(50, 100, 125, 150, 175, 255), 
+                       breaks = c(0, 100, 125, 150, 175, 200, Inf), 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
                                                  even.steps = FALSE)) +
