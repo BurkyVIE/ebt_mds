@@ -1,12 +1,10 @@
 library(tidyverse)
 
-vari <- expr(Count)
-if(vari == "Count") {
-  breaks <- c(100, 125, 150, 175, 200)
-  wte <- 100}
-if(vari == "Hits") {
-  breaks <- c(.5, 1, 1.5, 2, 2.5)
-  wte <- 1}
+vari <- expr(Count) # switches variables for representation
+
+breaks <- switch(quo_name(vari),
+                 Count = list(c(100, 125, 150, 175, 200), 100), #list contains [[1]] breaks and [[2]] split value for text color
+                 Hits = list(c(.5, 1, 1.5, 2, 2.5), 1))
 
 p <- ebt_mds_full %>%
   mutate(MoDa = str_sub(Date, 6, 10)) %>%
@@ -16,7 +14,7 @@ p <- ebt_mds_full %>%
             Avg = mean(!!vari),
             SD = sd(!!vari)) %>% 
   mutate(V = SD / Avg,
-         teco = case_when(Avg <= wte ~ "white", # text color; for dark backgrounds (tiles) use lighter colors
+         teco = case_when(Avg <= breaks[[2]] ~ "white", # text color; for dark backgrounds (tiles) use lighter colors
                           TRUE ~ "black")) %>% 
   separate(MoDa, into = c("Month", "Day")) %>% 
   ggplot(mapping = aes (x = Day, y = Month)) +
@@ -27,7 +25,7 @@ p <- ebt_mds_full %>%
                                          format(round(SD, 1), nsmall = 1), ")")), size = 2) +
   scale_fill_viridis_b(name = "Average Value",
                        option = "viridis", # Purples
-                       breaks = breaks, 
+                       breaks = breaks[[1]], 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
                                                  even.steps = FALSE)) +
@@ -41,4 +39,4 @@ p <- ebt_mds_full %>%
 
 windows(16, 9)
 plot(p)
-rm(vari, breaks, wte, p)
+rm(breaks, wte, p)
