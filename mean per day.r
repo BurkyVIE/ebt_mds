@@ -1,6 +1,6 @@
 library(tidyverse)
 
-vari <- expr(Hits)
+vari <- expr(Count)
 if(vari == "Count") {
   breaks <- c(100, 125, 150, 175, 200)
   wte <- 100}
