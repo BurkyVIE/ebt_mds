@@ -1,8 +1,8 @@
 library(tidyverse)
 
-vari <- expr(Hits) # switches variables for representation
+vari <- expr(Count) # switches variables for representation
 
-info_var <- switch(as_label(Count),
+info_var <- switch(as_label(vari),
                  Count = list(c(100, 125, 150, 175, 200), 100, "Entries"), #list contains [[1]] breaks and [[2]] split value for text color and [[3]] title info
                  Hits = list(c(.5, 1, 1.5, 2, 2.5), 1, "Hits"))
 
