@@ -1,10 +1,10 @@
 library(tidyverse)
 
-vari <- expr(Count) # switches variables for representation
+vari <- expr(Hits) # switches variables for representation
 
-breaks <- switch(quo_name(vari),
-                 Count = list(c(100, 125, 150, 175, 200), 100), #list contains [[1]] breaks and [[2]] split value for text color
-                 Hits = list(c(.5, 1, 1.5, 2, 2.5), 1))
+info_var <- switch(as_label(Count),
+                 Count = list(c(100, 125, 150, 175, 200), 100, "Entries"), #list contains [[1]] breaks and [[2]] split value for text color and [[3]] title info
+                 Hits = list(c(.5, 1, 1.5, 2, 2.5), 1, "Hits"))
 
 p <- ebt_mds_full %>%
   mutate(MoDa = str_sub(Date, 6, 10)) %>%
@@ -14,7 +14,7 @@ p <- ebt_mds_full %>%
             Avg = mean(!!vari),
             SD = sd(!!vari)) %>% 
   mutate(V = SD / Avg,
-         teco = case_when(Avg <= breaks[[2]] ~ "white", # text color; for dark backgrounds (tiles) use lighter colors
+         teco = case_when(Avg <= info_var[[2]] ~ "white", # text color; for dark backgrounds (tiles) use lighter colors
                           TRUE ~ "black")) %>% 
   separate(MoDa, into = c("Month", "Day")) %>% 
   ggplot(mapping = aes (x = Day, y = Month)) +
@@ -25,18 +25,18 @@ p <- ebt_mds_full %>%
                                          format(round(SD, 1), nsmall = 1), ")")), size = 2) +
   scale_fill_viridis_b(name = "Average Value",
                        option = "viridis", # Purples
-                       breaks = breaks[[1]], 
+                       breaks = info_var[[1]], 
                        guide = guide_coloursteps(barwidth = 25,
                                                  barheight = .75,
                                                  even.steps = FALSE)) +
   scale_color_identity() +
   scale_x_discrete(position = "top") +
   scale_y_discrete(limits = rev) +
-  labs(title = "EuroBillTracker - Daily Entries",
+  labs(title = paste("EuroBillTracker - Daily", info_var[[3]]),
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date), " (http://www.eurobilltracker.com)")) +
   theme_ebt()
 
 windows(16, 9)
 plot(p)
-rm(breaks, wte, p)
+rm(vari, info_var, p)
