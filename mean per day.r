@@ -1,8 +1,12 @@
 library(tidyverse)
 
-vari <- expr(Count)
-if(vari == "Count") breaks <- c(100, 125, 150, 175, 200);wte <- 100
-if(vari == "Hits") breaks <- c(.5, 1, 1.5, 2, 2.5); wte <- 1
+vari <- expr(Hits)
+if(vari == "Count") {
+  breaks <- c(100, 125, 150, 175, 200)
+  wte <- 100}
+if(vari == "Hits") {
+  breaks <- c(.5, 1, 1.5, 2, 2.5)
+  wte <- 1}
 
 p <- ebt_mds_full %>%
   mutate(MoDa = str_sub(Date, 6, 10)) %>%
@@ -37,4 +41,4 @@ p <- ebt_mds_full %>%
 
 windows(16, 9)
 plot(p)
-rm(var, breaks, wte, p)
+rm(vari, breaks, wte, p)
