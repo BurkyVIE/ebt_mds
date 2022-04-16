@@ -5,8 +5,9 @@ library(sf)
 
 # definitions ----
 ## colors ----
-cols <- viridis::viridis(4, direction = -1, begin = 2/10)
-cols <- c("navy", "firebrick", "grey75", "yellow")
+# cols <- viridis::viridis(4, direction = -1, begin = 2/10)
+# cols <- c("navy", "firebrick", "grey75", "yellow")
+cols <- c("navy", "#eb0e00", "#2c3131", "#fbbe00")
 
 ## enlarge raster ----
 i <- 3
