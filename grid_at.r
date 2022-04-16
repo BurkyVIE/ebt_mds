@@ -6,6 +6,7 @@ library(sf)
 # definitions ----
 ## colors ----
 cols <- viridis::viridis(4, direction = -1, begin = 2/10)
+cols <- c("navy", "firebrick", "lightblue", "yellow")
 
 ## enlarge raster ----
 i <- 3
@@ -38,7 +39,7 @@ visited <- st_join(grid, locs, join = st_covers) %>%
   filter(!is.na(Loc)) %>% 
   select(-(First:Loc)) %>% # no doubles; also unique next line
   unique()
-  
+
 ## Crop- Data reduction ----
 mapngrid <- st_intersection(grid, map_eu[grid,]) #map plus grid because double lines otherwise after transformation
 locs <- locs[grid,] # faster than st_crop(locs, grid)
@@ -46,7 +47,8 @@ locs <- locs[grid,] # faster than st_crop(locs, grid)
 # Plot ----
 p <- ggplot() +
   geom_sf(data = grid, color = cols[3], fill = cols[3]) +                                           # background for coloring of water bodies
-  geom_sf(data = mapngrid, color = cols[3], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
+  geom_sf(data = mapngrid, color = cols[3], fill = "grey25") +
+  # geom_sf(data = mapngrid, color = cols[3], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
   geom_sf(data = visited, color = NA, fill = cols[1], alpha = 1/5) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
   geom_sf(data = locs, color = cols[4], size = 5/4, alpha = 1/3) +
