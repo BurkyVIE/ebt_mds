@@ -59,7 +59,7 @@ p <- ggplot() +
 
 windows(15, 9)
 plot(p)
-# pdf("grid_at.pdf", paper = "a4r", width = 210, height = 297)
+# png(paste0(EBT_global$whereis, "/spec/locsdotsat.png"), width = 34, height = 21.5 ,units = "cm", res = 300)
 # plot(p)
 # dev.off()
 
