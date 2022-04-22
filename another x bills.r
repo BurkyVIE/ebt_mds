@@ -50,7 +50,7 @@ bind_rows(he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Accent") +
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
-  labs(title = paste0("EuroBillTracker - Time to Enter Another ..."),
+  labs(title = paste0("EuroBillTracker - Time to get another ..."),
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)"),
        x = "Days",
