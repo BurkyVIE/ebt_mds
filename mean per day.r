@@ -34,7 +34,7 @@ p <- ebt_mds_full %>%
   scale_y_discrete(limits = rev) +
   labs(title = paste("EuroBillTracker - Daily", info_var[[3]]),
        subtitle = "by Burky",
-       caption = paste0("as: ",max(ebt_mds$Date), " (http://www.eurobilltracker.com)")) +
+       caption = paste0("as: ",max(ebt_mds$Date), " (https://www.eurobilltracker.com)")) +
   theme_ebt()
 
 windows(16, 9)
