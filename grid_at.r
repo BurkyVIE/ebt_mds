@@ -54,7 +54,7 @@ p <- ggplot() +
   scale_y_continuous(expand = c(.01, .01)) +
   labs(title = "EuroBillTracker - Dots and Locations in and around AT",
        subtitle = "by Burky",
-       caption = "Proj = WGS 89 (EPSG:3416)\n(http://www.eurobilltracker.com)") +
+       caption = "Proj = WGS 89 (EPSG:3416)\n(https://www.eurobilltracker.com)") +
   coord_sf(crs = st_crs(3416)) +
   theme_ebt()
 
