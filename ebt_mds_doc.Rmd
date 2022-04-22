@@ -101,7 +101,7 @@ The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")
 
 Entries throughout each year:
 
-```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
+```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
 
 top <- 3
 
@@ -162,7 +162,7 @@ knitr::kable(tail(tmp, 5), format.args = list(big.mark = ','))
 
 Graphical representation of the monthly variation:
 
-```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
+```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
 
 ebt_grpd <- ebt_mds_full %>%
   # Zusammenfassen der Daten pro Monat
@@ -230,7 +230,7 @@ ebt_deno %>% select(-Date) %>%
 
 Distribution of denominations by year:
 
-```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
+```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
 
 ebt_deno %>% 
   group_by(Year = lubridate::year(Date)) %>% 
@@ -302,9 +302,9 @@ ebt_mds_full %>%
 
 ```
 
-Plot of the five most recent hit streaks:
+Plot of the 15 most recent hit streaks:
 
-```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=0.5625}
+```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
 
 p <- ggplot() +
   geom_rect(data = dat, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
