@@ -52,8 +52,9 @@ p <- ggplot() +
   geom_sf(data = locs, color = cols[4], size = 5/4, alpha = 1/3) +
   scale_x_continuous(expand = c(.01, .01)) +
   scale_y_continuous(expand = c(.01, .01)) +
-  labs(title = "Dots and Locations In and Around AT",
-       caption = "Proj = WGS 89 (EPSG:3416)") +
+  labs(title = "EuroBillTracker - Dots and Locations In and Around AT",
+       subtitle = "by Burky",
+       caption = "Proj = WGS 89 (EPSG:3416)\n(http://www.eurobilltracker.com)") +
   coord_sf(crs = st_crs(3416)) +
   theme_ebt()
 
