@@ -52,6 +52,7 @@ bind_rows(he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
   labs(title = paste0("EuroBillTracker - Time to Enter Another ..."),
        subtitle = "by Burky",
+       caption = paste0("as: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)"),
        x = "Days",
        y = "Count") +
   facet_wrap(~ Cat, ncol = 1) +
