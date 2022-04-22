@@ -1,4 +1,4 @@
-# Täglich
+# Täglich ----
 
 library(tidyverse)
 library(lubridate)
@@ -34,7 +34,9 @@ he %>%
   scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
   scale_x_continuous(name = "Time Elapsed (Days)", breaks = function(x)seq(0, x[2], by = 60), expand = c(.01, .01)) +
   scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
-  labs(title = "Aggregation of Entries over the Years") +
+  labs(title = "EuroBillTracker - Aggregation of Entries over the Years",
+       subtitle = "by Burky",
+       caption = paste0("as: ",max(ebt_mds$Date), " (https://www.eurobilltracker.com)")) +
   theme_ebt() -> p 
 
 windows(16, 9)
@@ -44,7 +46,7 @@ rm(last, slopes, he, p)
 
 
 
-# Wöchentlich
+# Wöchentlich ----
 
 library(tidyverse)
 library(lubridate)
@@ -81,7 +83,9 @@ he %>%
   scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
   scale_x_continuous(name = "Time Elapsed (Weeks)", breaks = function(x)seq(0, x[2], by = 8), expand = c(.01, .01)) +
   scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
-  labs(title = "Aggregation of Entries over the Years") +
+  labs(title = "EuroBillTracker - Aggregation of Entries over the Years",
+       subtitle = "by Burky",
+       caption = paste0("as: ",max(ebt_mds$Date), " (https://www.eurobilltracker.com)")) +
   theme_ebt() -> p
 
 windows(16, 9)
@@ -91,7 +95,7 @@ rm(last, slopes, he, p)
 
 
 
-# Monatlich
+# Monatlich ----
 
 library(tidyverse)
 library(lubridate)
@@ -128,7 +132,9 @@ he %>%
   scale_size_manual(name = "", values = c(rep(2.5, last), 1)) +
   scale_x_continuous(name = "Time Elapsed (Months)", breaks = function(x)seq(0, x[2], by = 2), expand = c(.01, .01)) +
   scale_y_continuous(name = "Cumulative Count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
-  labs(title = "Aggregation of Entries over the Years") +
+  labs(title = "EuroBillTracker - Aggregation of Entries over the Years",
+       subtitle = "by Burky",
+       caption = paste0("as: ",max(ebt_mds$Date), " (https://www.eurobilltracker.com)")) +
   theme_ebt() -> p
 
 windows(16, 9)
