@@ -5,7 +5,7 @@ library(sf)
 
 # definitions ----
 ## colors ----
-cols <- c("navy", "firebrick", "grey75", "blue2")
+cols <- c("navy", "firebrick", "grey75", "blue3")
 
 ## enlarge raster ----
 i <- 3
