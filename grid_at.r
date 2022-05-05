@@ -7,9 +7,9 @@ library(sf)
 ## colors ----
 cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040")
 ccol <- c("Austria" = cols[3],
-          "Liechtenstein" = cols[4], "Czech Republic" = cols[4], "Slovenia" = cols[4],
-          "Switzerland" = cols[5], "Slovakia" = cols[5], "Croatia" = cols[5],
-          "Germany" = cols[6], "Italy" = cols[6], "Hungary" = cols[6])
+          "Germany" = cols[4], "Slovakia" = cols[4], "Croatia" = cols[4],
+          "Switzerland" = cols[5], "Slovenia" = cols[5],
+          "Liechtenstein" = cols[6], "Czech Republic" = cols[6], "Hungary" = cols[6], "Italy" = cols[6])
 
 ## enlarge raster ----
 i <- 3
