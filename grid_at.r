@@ -36,7 +36,8 @@ locs <- pseudo %>%
 ## Dots mit Location ----
 visited <- st_join(grid, locs, join = st_covers) %>%
   filter(!is.na(Loc)) %>% 
-  select(-(First:Loc)) %>% # no doubles; also unique next line
+  select(-c(First, ZIP:Loc)) %>% # no doubles; also unique next line
+  select(-Country) %>%
   unique()
 
 ## Crop- Data reduction ----
