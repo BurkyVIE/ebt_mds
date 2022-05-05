@@ -5,7 +5,11 @@ library(sf)
 
 # definitions ----
 ## colors ----
-cols <- c("navy", "firebrick", "darkblue", "blue3")
+cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040")
+ccol <- c("Austria" = cols[3],
+          "Liechtenstein" = cols[4], "Czech Republic" = cols[4], "Slovenia" = cols[4],
+          "Switzerland" = cols[5], "Slovakia" = cols[5], "Croatia" = cols[5],
+          "Germany" = cols[6], "Italy" = cols[6], "Hungary" = cols[6])
 
 ## enlarge raster ----
 i <- 3
@@ -37,7 +41,7 @@ locs <- pseudo %>%
 visited <- st_join(grid, locs, join = st_covers) %>%
   filter(!is.na(Loc)) %>% 
   select(-c(First, ZIP:Loc)) %>% # no doubles; also unique next line
-  select(-Country) %>%
+  # select(-Country) %>%
   unique()
 
 ## Crop- Data reduction ----
@@ -46,16 +50,18 @@ locs <- locs[grid,] # faster than st_crop(locs, grid)
 
 # Plot ----
 p <- ggplot() +
-  geom_sf(data = grid, color = cols[3], fill = cols[3]) +                                           # background for coloring of water bodies
-  geom_sf(data = mapngrid, color = cols[3], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
-  geom_sf(data = visited, color = NA, fill = cols[1], alpha = 1/5) +
+  geom_sf(data = grid, color = cols[1], fill = cols[1]) +                                           # background for coloring of water bodies
+  geom_sf(data = mapngrid, color = cols[1], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
+  geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 1/5) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
-  geom_sf(data = locs, color = cols[4], size = 5/4, alpha = 1/3) +
+  geom_sf(data = locs, mapping = aes(color = Country), show.legend = FALSE, size = 5/4, alpha = 1/3) +
   scale_x_continuous(expand = c(.01, .01)) +
   scale_y_continuous(expand = c(.01, .01)) +
+  scale_color_manual(values = ccol) +
+  scale_fill_manual(values = ccol) +
   labs(title = "EuroBillTracker - Dots and Locations in and around AT",
        subtitle = "by Burky",
-       caption = "Proj = WGS 89 (EPSG:3416)\n(https://www.eurobilltracker.com)") +
+       caption = paste0("Proj = WGS 89 (EPSG:3416)\nas: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)")) +
   coord_sf(crs = st_crs(3416)) +
   theme_ebt()
 
@@ -66,4 +72,4 @@ plot(p)
 # dev.off()
 
 # clean-up ----
-rm(cols, map_eu, grid, mapngrid, locs, visited, p)
+rm(cols, ccol, map_eu, grid, mapngrid, locs, visited, p)
