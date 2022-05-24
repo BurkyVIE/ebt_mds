@@ -126,4 +126,5 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   
   # Rückgabe
   return(tmp)
+  rm(tmp)
 }
