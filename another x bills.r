@@ -48,7 +48,7 @@ bind_rows(he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
   geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2, alpha = .75) +
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
-  scale_fill_brewer(palette = "Accent") +
+  scale_fill_brewer(palette = "Set1") +
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
   labs(title = paste0("EuroBillTracker - Time to get another ..."),
        subtitle = "by Burky",
