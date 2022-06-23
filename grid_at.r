@@ -5,11 +5,11 @@ library(sf)
 
 # definitions ----
 ## colors ----
-cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040")
-ccol <- c("Austria" = cols[3],
-          rep(cols[4], 4) |> set_names(c("Czech Republic", "Slovenia", "Switzerland", "Serbia")), # red
-          rep(cols[5], 3) |> set_names(c("Germany", "Slovakia", "Croatia")), # yellow
-          rep(cols[6], 6) |> set_names(c("Poland", "Hungary", "Italy", "Liechtenstein", "France", "Bosnia and Herzegovina"))) # green
+cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040") # 3 = blue (navy), 4 = red, 5 = yellow, 6 = green
+ccol <- c(rep(cols[5], 1) |> set_names(c("Austria")),
+          rep(cols[4], 4) |> set_names(c("Czech Republic", "Slovenia", "Switzerland", "Serbia")),
+          rep(cols[3], 3) |> set_names(c("Germany", "Slovakia", "Croatia")),
+          rep(cols[6], 6) |> set_names(c("Poland", "Hungary", "Italy", "Liechtenstein", "France", "Bosnia and Herzegovina")))
 
 ## enlarge raster ----
 i <- 3
