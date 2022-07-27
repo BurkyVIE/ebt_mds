@@ -5,6 +5,7 @@ library(sf)
 
 # definitions ----
 ## colors ----
+# https://www.wolfram.com/mathematica/new-in-10/entity-based-geocomputation/find-a-four-coloring-of-a-map-of-europe.html
 cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040") # 3 = blue (navy), 4 = red, 5 = yellow, 6 = green
 ccol <- c(rep(cols[3], 11) |> set_names(c('Austria', 'Croatia', 'Latvia', 'Ireland', 'France', 'Greece', 'Kosovo', 'Netherlands', 'Norway', 'Poland', 'Romania')),
           rep(cols[4], 20) |> set_names(c('Estonia', 'Portugal', 'Albania', 'Andorra', 'Belgium', 'Cyprus', 'Czech Republic', 'Denmark', 'Finland', 'Iceland', 'Lithuania', 'Malta', 'Monaco', 'San Marino', 'Serbia', 'Slovenia', 'Switzerland', 'Ukraine', 'United Kingdom', 'Vatican City')),
