@@ -52,7 +52,7 @@ locs <- locs[grid,] # faster than st_crop(locs, grid)
 p <- ggplot() +
   geom_sf(data = grid, color = cols[1], fill = cols[1]) +                                           # background for coloring of water bodies
   geom_sf(data = mapngrid, color = cols[1], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
-  geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 2/5) +
+  geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 3/10) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
   geom_sf(data = locs, mapping = aes(color = Country), show.legend = FALSE, size = 5/4, alpha = 1/3) +
   scale_x_continuous(expand = c(.01, .01)) +
