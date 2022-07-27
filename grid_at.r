@@ -6,10 +6,10 @@ library(sf)
 # definitions ----
 ## colors ----
 cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040") # 3 = blue (navy), 4 = red, 5 = yellow, 6 = green
-ccol <- c(rep(cols[5], 1) |> set_names(c("Austria")),
-          rep(cols[4], 4) |> set_names(c("Czech Republic", "Slovenia", "Switzerland", "Serbia")),
-          rep(cols[3], 3) |> set_names(c("Germany", "Slovakia", "Croatia")),
-          rep(cols[6], 6) |> set_names(c("Poland", "Hungary", "Italy", "Liechtenstein", "France", "Bosnia and Herzegovina")))
+ccol <- c(rep(cols[3], 11) |> set_names(c('Austria', 'Croatia', 'Latvia', 'Ireland', 'France', 'Greece', 'Kosovo', 'Netherlands', 'Norway', 'Poland', 'Romania')),
+          rep(cols[4], 20) |> set_names(c('Estonia', 'Portugal', 'Albania', 'Andorra', 'Belgium', 'Cyprus', 'Czech Republic', 'Denmark', 'Finland', 'Iceland', 'Lithuania', 'Malta', 'Monaco', 'San Marino', 'Serbia', 'Slovenia', 'Switzerland', 'Ukraine', 'United Kingdom', 'Vatican City')),
+          rep(cols[5], 4) |> set_names(c('Bulgaria', 'Luxembourg', 'Bosnia and Herzegovina', 'Hungary')),
+          rep(cols[6], 10) |> set_names(c('Slovakia', 'Belarus', 'Germany', 'Italy', 'Liechtenstein', 'Macedonia', 'Moldova', 'Montenegro', 'Spain', 'Sweden')))
 
 ## enlarge raster ----
 i <- 3
@@ -52,7 +52,7 @@ locs <- locs[grid,] # faster than st_crop(locs, grid)
 p <- ggplot() +
   geom_sf(data = grid, color = cols[1], fill = cols[1]) +                                           # background for coloring of water bodies
   geom_sf(data = mapngrid, color = cols[1], fill = rgb(221, 226, 233, maxColorValue = 255)) +       # fill with background of theme_ebt
-  geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 1/5) +
+  geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 2/5) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], size = 3/2, fill = NA) +
   geom_sf(data = locs, mapping = aes(color = Country), show.legend = FALSE, size = 5/4, alpha = 1/3) +
   scale_x_continuous(expand = c(.01, .01)) +
