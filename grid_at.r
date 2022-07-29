@@ -5,8 +5,10 @@ library(sf)
 
 # definitions ----
 ## colors ----
-# https://www.wolfram.com/mathematica/new-in-10/entity-based-geocomputation/find-a-four-coloring-of-a-map-of-europe.html
-cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040") # 3 = blue (navy), 4 = red, 5 = yellow, 6 = green
+# cols <- c("grey33", "firebrick", "navy", "#800040", "#808000", "#008040") # 3 = blue (navy), 4 = red, 5 = yellow, 6 = green
+cols <- c("grey33", "firebrick", "#004873", "#a1262d", "#e8bf28", "#008e5e") # 3 = blue, 4 = red, 5 = yellow, 6 = green; Signalfarben http://www.iso7010.de/farbtabelle/
+# cols <- c("grey33", "firebrick", "#009ee0", "#e2001a", "#ffec00", "#328925") # 3 = blue, 4 = red, 5 = yellow, 6 = green; https://www.wolfram.com/mathematica/new-in-10/entity-based-geocomputation/find-a-four-coloring-of-a-map-of-europe.html
+cols <- cols[c(1, 2, 3, 4, 5, 6)]
 ccol <- c(rep(cols[3], 11) |> set_names(c('Austria', 'Croatia', 'Latvia', 'Ireland', 'France', 'Greece', 'Kosovo', 'Netherlands', 'Norway', 'Poland', 'Romania')),
           rep(cols[4], 20) |> set_names(c('Estonia', 'Portugal', 'Albania', 'Andorra', 'Belgium', 'Cyprus', 'Czech Republic', 'Denmark', 'Finland', 'Iceland', 'Lithuania', 'Malta', 'Monaco', 'San Marino', 'Serbia', 'Slovenia', 'Switzerland', 'Ukraine', 'United Kingdom', 'Vatican City')),
           rep(cols[5], 4) |> set_names(c('Bulgaria', 'Luxembourg', 'Bosnia and Herzegovina', 'Hungary')),
