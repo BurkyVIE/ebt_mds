@@ -15,7 +15,7 @@ ccol <- c(rep(cols[3], 11) |> set_names(c('Austria', 'Croatia', 'Latvia', 'Irela
           rep(cols[6], 10) |> set_names(c('Slovakia', 'Belarus', 'Germany', 'Italy', 'Liechtenstein', 'Macedonia', 'Moldova', 'Montenegro', 'Spain', 'Sweden')))
 
 ## enlarge raster ----
-i <- 3
+i <- 5
 
 # initialization ----
 ## EBT-Grid of/around austria (based on europe-grid) ----
@@ -62,7 +62,7 @@ p <- ggplot() +
   scale_y_continuous(expand = c(.01, .01)) +
   scale_color_manual(values = ccol) +
   scale_fill_manual(values = ccol) +
-  labs(title = "EuroBillTracker - Dots and Locations in and around AT",
+  labs(title = "EuroBillTracker - Dots and Locations in and about AT",
        subtitle = "by Burky",
        caption = paste0("Proj = WGS 89 (EPSG:3416)\nas: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)")) +
   coord_sf(crs = st_crs(3416)) +
