@@ -12,7 +12,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   library(lubridate)
   
   grouping = sym(grp_nm)
-  grouping_nm = quo_name(grouping)
+  grouping_nm = as_label(grouping)
   
   # Auswahl der Periode 
   if(ytd) period <- "year" # Für year-to-date
