@@ -12,7 +12,7 @@ ebt_mds_grpd(per = "day", grp_nm = "Date") |>
   tail(param[1]) %>%
   ggplot() +
   aes(x = Date) +
-  geom_col(mapping = aes(y = !!vari), fill = "beige", color = "gold") +
+  geom_col(mapping = aes(y = !!vari), fill = "lightblue", color = "navy") +
   geom_line(mapping = aes(y = Avg), color = "firebrick", lwd = 1.5) +
   scale_x_date(date_labels = "%m/%Y") +
   labs(title = paste0("EuroBillTracker - Activity Over the Past ", param[1], " Days, including a ", param[2], "-day Moving Average"),
