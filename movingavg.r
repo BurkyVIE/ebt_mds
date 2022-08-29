@@ -5,7 +5,7 @@ vari <- quote(Hits) # switch variables for representation
 
 ebt_mds_grpd(per = "day", grp_nm = "Date") |>
   tail(sum(param)) |>
-  select(Date, vari) |>
+  select(Date, all_of(vari)) |>
   mutate(Cum = cumsum(!!vari),
          Lag = lag(Cum, n = param[2]),
          Avg = (Cum - Lag) / param[2]) |>
