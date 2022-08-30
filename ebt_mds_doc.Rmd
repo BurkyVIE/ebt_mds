@@ -13,6 +13,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(lubridate)
+library(flextable)
+
+old <- set_flextable_defaults(font.family = "Calibri",
+                              table.layout = "autofit")
 
 colors <- viridis::viridis(7, begin = .05, end = .95)
 
@@ -62,10 +66,9 @@ Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** betw
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
 \pagebreak
-
 ## Active Periods
 
-The five longest active periods were:
+The three longest active periods were:
 
 ```{r periods, echo=FALSE}
 
@@ -90,12 +93,13 @@ ebt_mds_full %>%
   arrange(desc(Days)) %>%
   filter(Type == "active") %>% 
   select(-Type) %>% 
-  head(5) -> tmp
-  knitr::kable(tmp, format.args = list(big.mark = ','))
+  head(3) -> tmp
+  # knitr::kable(tmp, format.args = list(big.mark = ','))
+  flextable::flextable(tmp)
 
 ```
 
-The **five longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
+The **three longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
 
 ## Yearly Activity
 
@@ -129,10 +133,9 @@ rm(top, p)
 ```
 
 \pagebreak
-
 ## Monthly Activity
 
-The five most active months were:
+The seven most active months were:
 
 ```{r months, echo=FALSE}
 
@@ -148,18 +151,21 @@ ebt_mds_full %>%
             HitRt = (Bills / Hits) %>% round(2),
             .groups = "drop") %>% 
   arrange(desc(Bills)) -> tmp
-  knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
-
+  # knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
+  flextable(head(tmp, 7))
+  
 ```
 
-The five least active months were:
+The seven least active months were:
 
 ```{r months2, echo=FALSE}
 
-knitr::kable(tail(tmp, 5), format.args = list(big.mark = ','))
+# knitr::kable(tail(tmp, 5), format.args = list(big.mark = ','))
+  flextable(tail(tmp, 7))
 
 ```
 
+\pagebreak
 Graphical representation of the monthly variation:
 
 ```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
@@ -190,7 +196,7 @@ p_dat <- ebt_grpd  %>%
 p <- ggplot(data = p_dat, mapping = aes(x = Month, y = Count)) + 
   geom_point(mapping = aes(color = Color), shape = 4, size = 0.8, alpha = 0.65, show.legend = FALSE) +
   geom_smooth(color = colors[2], method = "loess", span = 1.5 / log(ebt_grpd$Month %>% length()),  se = FALSE) +
-  scale_x_date(name = "Time", date_breaks = "2 years", date_labels = "%Y", expand = c(.01, .01)) +
+  scale_x_date(name = "Time", date_breaks = "4 years", date_labels = "%Y", expand = c(.01, .01)) +
   scale_y_continuous(name = "", expand = c(.02, .02)) +
   scale_color_manual(values = c("old" = colors[5], "recent" = colors[6])) +
   facet_wrap(~ What, scales = "free_y", ncol = 2) +
@@ -201,7 +207,6 @@ plot(p)
 ```
 
 \pagebreak
-
 ## Denomination
 
 Distribution of entered bills by denomination:
@@ -218,13 +223,14 @@ ebt_deno %>% select(-Date) %>%
   summarise(Count = sum(Count), .groups = "drop") %>% 
   mutate(Val = substr(Denom, 2, 4) %>% as.integer(),
          Denom = factor(Denom, labels = c(5, 10, 20, 50, 100, 200, 500) %>%
-                                 stringr::str_pad(., width = 3, side = "left") %>% 
+                                 stringr::str_pad(., width = 3, side = "left") %>%
                                  paste0("\u20ac ", .)), # EURO symbol
          Value = Count * Val,
          C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
          V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
   select(Denom, Count, C_Pct, Value, V_Pct) -> tmp
-  knitr::kable(tmp, format.args = list(big.mark = ','))
+  # knitr::kable(tmp, format.args = list(big.mark = ','))
+  flextable(tmp)
 
 ```
 
@@ -248,8 +254,6 @@ p <- ggplot(data = tmp, mapping = aes(x = Year, y = Count, group = Denom)) +
 plot(p)
 
 ```
-
-\pagebreak
 
 ## Hits
 
@@ -295,10 +299,12 @@ ebt_mds_full %>%
     mutate(`#` = symb[`#`])
   
   tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
-    replace_na(list(`#`= "&#0000;")) %>% # Null symbol (HTML)
+    # replace_na(list(`#`= "&#0000;")) %>% # Null symbol (HTML)
+    replace_na(list(`#`= " ")) %>% 
     relocate(`#`)
   
-  knitr::kable(tmp, format.args = list(big.mark = ','))
+  # knitr::kable(tmp, format.args = list(big.mark = ','))
+  flextable(tmp)
 
 ```
 
@@ -317,4 +323,8 @@ p <- ggplot() +
 
 plot(p)
 
+```
+
+```{r end, include=FALSE}
+do.call(set_flextable_defaults, old)
 ```
