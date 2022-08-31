@@ -94,7 +94,7 @@ ebt_mds_full %>%
   select(-Type) %>% 
   head(3) -> tmp
   # knitr::kable(tmp, format.args = list(big.mark = ','))
-  flextable::flextable(tmp)
+  flextable(tmp)
 
 ```
 
