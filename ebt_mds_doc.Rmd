@@ -1,5 +1,5 @@
 ---
-title: "EuroBillTracker"
+title: "Burky @ EuroBillTracker"
 subtitle: "https://www.eurobilltracker.com/?referer=32954"
 author: "Burky"
 output:
@@ -16,7 +16,9 @@ library(lubridate)
 library(flextable)
 
 old <- set_flextable_defaults(font.family = "Calibri",
-                              table.layout = "autofit")
+                              table.layout = "autofit",
+                              decimal.mark = ".",
+                              big.mark = ",")
 
 colors <- viridis::viridis(7, begin = .05, end = .95)
 
@@ -32,7 +34,6 @@ ebt_mds_full <-
          Value = map_dbl(.x = Deno, .f = ~ (t(.) %*% c(5L, 10L, 20L, 50L, 100L, 200L, 500L)) %>% as.integer()),
          nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
   select(Date, Day, Deno, Count, Value, Hits, Loc, nLoc)
-# Immer englische Abkuerzungen fuer die Wochentage verwenden [wday() nimmt aus locale()]
 ```
 
 # About
@@ -43,31 +44,30 @@ EuroBillTracker (EBT) is an international non-profit volunteer team dedicated to
 -   Tracking information: When a note is re-entered, the users who previously entered it are notified via email. These hits can be seen in the statistics section.
 -   Statistics and rankings: Who enters the most notes, which are the best countries? Where are the notes currently situated?
 
-# User Burky
+# User: Burky
 
 ## General
 
 ```{r general, include=FALSE}
 
-days <- tibble (ebt_mds_full %>% count(name = "total"),
-                ebt_mds_full %>% filter(Count > 0) %>% count(name = "bills"),
-                ebt_mds_full %>% filter(Hits > 0) %>% count(name = "hits"))
+days <- tibble(ebt_mds_full %>% count(name = "total"),
+               ebt_mds_full %>% filter(Count > 0) %>% count(name = "bills"),
+               ebt_mds_full %>% filter(Hits > 0) %>% count(name = "hits"))
 
 stat <- ebt_mds_full %>% summarise(across(.cols = Count:Hits, .fns = ~ sum(., na.rm = TRUE)), .groups = "drop") %>%
   bind_cols(
-    ebt_mds_full %>% summarise(across(.cols = Loc, .fns = ~ unlist(.) %>% n_distinct()), .groups = "drop")
-  )
+    ebt_mds_full %>% summarise(across(.cols = Loc, .fns = ~ unlist(.) %>% n_distinct()), .groups = "drop"))
 ```
 
-Activity was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occurred on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
-**`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`).\
+Active contribution to EBT was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occurred on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
+**`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`);
 **`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occurred (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).\
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
 \pagebreak
 ## Active Periods
 
-The three longest active periods were:
+Active periods are consecutive days with at least one bill entered. The three longest such periods were:
 
 ```{r periods, echo=FALSE}
 
@@ -102,9 +102,9 @@ The **three longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ","
 
 ## Yearly Activity
 
-Entries throughout each year:
+Active contribution to EBT was recorded in `r (substr(ebt_mds_full$Date, 1, 4) |> unique() |> length())` different years. Cumulative entries throughout the recent years look like:
 
-```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
+```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
 top <- 3
 
@@ -134,7 +134,8 @@ rm(top, p)
 \pagebreak
 ## Monthly Activity
 
-The seven most active months were:
+Active contribution to EBT was recorded in `r (substr(ebt_mds_full$Date, 1, 7) |> unique() |> length())` different months.\
+The seven month with most entered bills were:
 
 ```{r months, echo=FALSE}
 
@@ -155,7 +156,7 @@ ebt_mds_full %>%
   
 ```
 
-The seven least active months were:
+The seven months with least entered bills were:
 
 ```{r months2, echo=FALSE}
 
@@ -167,7 +168,7 @@ The seven least active months were:
 \pagebreak
 Graphical representation of the monthly variation:
 
-```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
+```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
 ebt_grpd <- ebt_mds_full %>%
   # Zusammenfassen der Daten pro Monat
@@ -235,7 +236,7 @@ ebt_deno %>% select(-Date) %>%
 
 Distribution of denominations by year:
 
-```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
+```{r yearly, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
 ebt_deno %>% 
   group_by(Year = lubridate::year(Date)) %>% 
@@ -254,6 +255,7 @@ plot(p)
 
 ```
 
+\pagebreak
 ## Hits
 
 The five longest hit streaks were:
@@ -309,7 +311,7 @@ ebt_mds_full %>%
 
 Plot of the 15 most recent hit streaks:
 
-```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=1/sqrt(2)}
+```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
 p <- ggplot() +
   geom_rect(data = dat, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
