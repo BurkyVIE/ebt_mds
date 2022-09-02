@@ -49,4 +49,4 @@ ebd <- function(year = NULL){
   rm(year, count, ebd, dur)
 }
 
-# map_df(.x = 2005:2021, .f = ~ebd(.x))
+# map_df(.x = 2004:2021, .f = ~ebd(.x))
