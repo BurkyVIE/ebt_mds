@@ -40,7 +40,7 @@ ebd <- function(year = NULL){
     Count = count,
     EBDay = ebd,
     Days = dur,
-    StdYear = dur / 365)
+    StdYears = dur / 365)
   
   # Return Result
   return(res)
