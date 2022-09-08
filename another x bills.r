@@ -29,9 +29,8 @@ library(tidyverse)
 x <- 25e3
 x <- x * c(1, 30, 1/100)
 
-he <- ebt_mds_full %>%
+he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
   select(Date, Count, Value, Hits) %>%
-  arrange(Date) %>%
   mutate(across(.cols = Count:Hits, .fns = ~ cumsum(.))) %>%
   mutate(D_Cnt = Count %% x[1],
          D_Val = Value %% x[2],
