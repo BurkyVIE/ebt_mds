@@ -16,8 +16,9 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
 p <- ggplot(data = dat) +
   aes(x = Date, y =cHitRt, fill = Set) +
   geom_col(width = 1) +
-  scale_y_log10() +
-  scale_fill_brewer(palette = "RdYlGn", direction = -1, na.value = "grey50")
+  scale_x_date(name = "Time", date_minor_breaks = "year") +
+  scale_y_log10(name = "Cumulative Hit Ratio") +
+  scale_fill_brewer(name = "Level", palette = "RdYlGn", direction = -1, na.value = "grey50")
 
 windows(16, 4, restoreConsole = TRUE)
 plot(p)
