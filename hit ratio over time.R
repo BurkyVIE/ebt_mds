@@ -4,7 +4,7 @@ library(tidyverse)
 # GLOBAL ----
 cuts <- list(
   c(0, 75, 100, 125, 250, 1000, Inf),
-  c("< 75", "< 100", "< 125", "< 250", "< 1000", "> 1000"))
+  c("< 75", "< 100", "< 125", "< 250", "< 1000", "≥ 1000"))
 
 # DATA ----
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
