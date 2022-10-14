@@ -27,7 +27,7 @@ p <- ggplot(data = dat) +
   geom_col(width = 1) +
   geom_point(data = spec, shape = 1, size = 5, show.legend = FALSE) +
   ggrepel::geom_label_repel(data = spec, mapping = aes(label = Label),
-                            box.padding = 1.5, nudge_y = -0.5, direction = "x",
+                            box.padding = 1.5, nudge_y = -0.25, direction = "x",
                             size = 2.75, fill = rgb(221, 226, 233, maxColorValue = 255), alpha = 3/4, show.legend = FALSE) +
   scale_x_date(name = "Time", date_minor_breaks = "year", expand = c(1/100, 0)) +
   scale_y_log10(name = "Cumulative Hit Ratio [log10]", labels = function(x)format(x, big.mark = ",")) +
