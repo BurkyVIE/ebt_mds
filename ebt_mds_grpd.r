@@ -5,7 +5,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   # ytd_month   year-to-date Monat
   # period      gruppierende (Zeit-)Variable
   # grp_nm      Bezeichnung im Ergebnis
-  # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
+  # reverse     Umkehren der Reihenfolge im Ergebnis (= j?ngster Zeitraum zuerst)
   
   # Notwendige libraries
   library(tidyverse)
@@ -27,8 +27,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
     'c'(today()) %>%                     # inkl heute ...
     full_seq(1) %>%                      # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     tibble("Date" = .) %>%               # in einen Tibble umwandeln ...
-    left_join(mds_data, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfügen.
-    # Fülle Deno auf 7 Stellen auf und wandle Hits in integer um
+    left_join(mds_data, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einf?gen.
+    # F?lle Deno auf 7 Stellen auf und wandle Hits in integer um
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) %>%
     replace_na(list(Hits = 0L)) -> tmp
@@ -82,7 +82,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
            HitRt = Count / Hits,
            EntRt = Count / Days,
            LocRt = nLoc / Days,
-           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgeführt wird
+           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgefhrt wird
            AvPctl = Avg %>% ecdf(.)(.),
            HRPctl = HitRt %>% ecdf(.)(.),
            ERPctl = EntRt %>% ecdf(.)(.),
