@@ -8,7 +8,7 @@ ebd <- function(year = NULL){
   
   #Calculate ----
   # Get Data
-  dat <- ebt_mds %>%
+  dat <- ebt_mds |>
     transmute(Date, Count = map_int(.x = Deno, .f = ~ as.integer(sum(.x))))
   
   # Get 'count' to look for in the future
