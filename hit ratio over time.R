@@ -15,8 +15,8 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
          Change = cHitRt / lag(cHitRt, 1),
          Change = case_when(Change < 1 ~ "lower",
                             Change > 1 ~ "higher",
-                            TRUE ~ "equal"),
-         Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
+                            TRUE ~ "equal"))
+dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
 spec0 <- filter(dat, !is.na(cHitRt))
 
