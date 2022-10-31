@@ -18,7 +18,8 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
                             TRUE ~ "equal"),
          Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
-spec0 <- filter(dat, cHitRt != Inf)
+spec0 <- filter(dat, !is.na(cHitRt))
+
 spec <- bind_rows(
   filter(spec0, row_number() == 1),
   filter(spec0, cHitRt == min(cHitRt)),
