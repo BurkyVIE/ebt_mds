@@ -12,6 +12,10 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   transmute(Date, cCount = cumsum(Count), cHits = cumsum(Hits)) |>
   mutate(cHitRt = cCount / cHits,
          cHitRt = na_if(cHitRt, Inf),
+         Change = cHitRt / lag(cHitRt, 1),
+         Change = case_when(Change < 1 ~ "lower",
+                            Change > 1 ~ "higher",
+                            TRUE ~ "equal"),
          Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
 spec0 <- filter(dat, cHitRt != Inf)
