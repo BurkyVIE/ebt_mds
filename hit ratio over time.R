@@ -13,7 +13,6 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   mutate(cCount = cumsum(Count),
          cHits = cumsum(Hits),
          cHitRt = cCount / cHits,
-         cHitRt = na_if(cHitRt, Inf),
          cHitRtLong = num(cHitRt, digits = 5),
          Change = cHitRt / lag(cHitRt, 1),
          Change = case_when(Change < 1 ~ "lower",
@@ -21,7 +20,7 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
                             TRUE ~ "equal"))
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
-spec0 <- filter(dat, !is.na(cHitRt))
+spec0 <- filter(dat, is.finite(cHitRt))
 
 spec <- bind_rows(
   filter(spec0, row_number() == 1),
