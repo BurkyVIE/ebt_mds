@@ -9,8 +9,10 @@ cuts <- list(
 
 # DATA ----
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
-  transmute(Date, cCount = cumsum(Count), cHits = cumsum(Hits)) |>
-  mutate(cHitRt = cCount / cHits,
+  select(Date, Count, Hits, HitRt) |>
+  mutate(cCount = cumsum(Count),
+         cHits = cumsum(Hits),
+         cHitRt = cCount / cHits,
          cHitRt = na_if(cHitRt, Inf),
          cHitRtLong = num(cHitRt, digits = 5),
          Change = cHitRt / lag(cHitRt, 1),
