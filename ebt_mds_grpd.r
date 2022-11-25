@@ -86,7 +86,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
       LocRt = nLoc / Days,
       across(.cols = c(Av = Avg, HR = HitRt, ER = EntRt, LR = LocRt), # empirische Verteilungsfunktionen - was ecdf(.)(.)
              .fns = ~ rank(., ties.method = "max", na.last = "keep") / sum(!is.na(.)),
-             .names = "{.col}Pctl_"))
+             .names = "{.col}Pctl"))
   
   # Labels
   if(period == "weekday") {
