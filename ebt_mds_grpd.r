@@ -72,21 +72,22 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   
   # Diverse Ableitungen
   tmp <- tmp %>% 
-    mutate(map2_df(map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), Loc, # map2 1) expandierte Denos und 2) Locations
-                   ~ data.frame(Count = length(.x),                                      # mappe eine Reihe von Funktionen gleichzeitig
-                                Value = as.integer(sum(.x)),
-                                nLoc = length(.y),
-                                Avg = mean(.x),
-                                Med = median(.x),
-                                SD = sd(.x))),
-           HitRt = Count / Hits,
-           EntRt = Count / Days,
-           LocRt = nLoc / Days,
-           AvPctl = Avg, HRPctl = HitRt, ERPctl = EntRt, LRPctl = LocRt, # Variablen für die die ecdf durchgefhrt wird
-           AvPctl = Avg %>% ecdf(.)(.),
-           HRPctl = HitRt %>% ecdf(.)(.),
-           ERPctl = EntRt %>% ecdf(.)(.),
-           LRPctl = LocRt %>% ecdf(.)(.))
+    mutate(map2_df(                                                   # map2 auf ...
+      map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), # 1) expandierte Denos (eigenes map) und ...
+      Loc,                                                            # 2) Locations ...
+      ~ data.frame(Count = length(.x),                                # eine Reihe von Funktionen gleichzeitig
+                   Value = as.integer(sum(.x)),
+                   nLoc = length(.y),
+                   Avg = mean(.x),
+                   Med = median(.x),
+                   SD = sd(.x))),
+      HitRt = Count / Hits, # Ableitungen
+      EntRt = Count / Days,
+      LocRt = nLoc / Days,
+      AvPctl = Avg %>% ecdf(.)(.),   # empirische Verteilungsfunktionene
+      HRPctl = HitRt %>% ecdf(.)(.),
+      ERPctl = EntRt %>% ecdf(.)(.),
+      LRPctl = LocRt %>% ecdf(.)(.))
   
   # Labels
   if(period == "weekday") {
