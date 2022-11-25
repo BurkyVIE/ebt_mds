@@ -11,15 +11,16 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   library(tidyverse)
   library(lubridate)
   
+  # Evaluation der Gruppe/des Gruppennamens
   grouping = sym(grp_nm)
   grouping_nm = as_label(grouping)
   
   # Auswahl der Periode 
-  if(ytd) period <- "year" # Für year-to-date
-  
   period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
-  if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")]
-  if(identical(period, character(0))) return(NULL)
+  
+  if(ytd) period <- "year" # für year-to-date
+  if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")] # wenn keine Auswahl im Funktionsaufruf
+  if(identical(period, character(0))) return(NULL) # beende Funktion wenn keine Auswahl (= 0)
   
   # Erstelle vollständige Liste der möglichen Daten (= Datümer)
   c(today(tzone = "CET"),                # bis inkl heute ... --- CET weil in Arbeit keine std-tz gesetzt
