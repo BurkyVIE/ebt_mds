@@ -5,7 +5,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   # ytd_month   year-to-date Monat
   # period      gruppierende (Zeit-)Variable
   # grp_nm      Bezeichnung im Ergebnis
-  # reverse     Umkehren der Reihenfolge im Ergebnis (= j?ngster Zeitraum zuerst)
+  # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
   
   # Notwendige libraries
   library(tidyverse)
@@ -35,8 +35,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   
   # year-to-date
   if(ytd) {
-    if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(), "%d"))
-    if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(), "%m"))
+    if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(tzone = "CET"), "%d"))
+    if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(tzone = "CET"), "%m"))
     d <- ytd_day; m <- ytd_month
     tmp <- tmp %>% 
       filter(month(Date) < m | (month(Date) == m & day(Date) <= d))
@@ -84,7 +84,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
       HitRt = Count / Hits, # Ableitungen
       EntRt = Count / Days,
       LocRt = nLoc / Days,
-      AvPctl = Avg %>% ecdf(.)(.),   # empirische Verteilungsfunktionene
+      AvPctl = Avg %>% ecdf(.)(.),
       HRPctl = HitRt %>% ecdf(.)(.),
       ERPctl = EntRt %>% ecdf(.)(.),
       LRPctl = LocRt %>% ecdf(.)(.))
