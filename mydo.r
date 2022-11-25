@@ -22,7 +22,7 @@ mydo <- function()
     geom_ribbon(mapping = aes(ymax = Inf, ymin = Days * 225, fill = "225 - Inf"), alpha = 1/8) +
     scale_fill_manual(name = "Bills per Day", values = c("firebrick", "gold", "yellowgreen", "forestgreen")) +
     geom_smooth(se = FALSE, color = "orangered") +
-    geom_path(size = 1.5, alpha = 1/4) +
+    geom_path(linewidth = 1.5, alpha = 1/4) +
     geom_point(size = 4) +
     scale_x_date(expand = c(.01, .01)) +
     labs(title = paste0("EuroBillTracker - ", per_list[selection, 3], " entered Bills for ", per_list[selection, 4]),
