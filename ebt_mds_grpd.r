@@ -84,7 +84,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
       HitRt = Count / Hits, # Ableitungen
       EntRt = Count / Days,
       LocRt = nLoc / Days,
-      AvPctl = Avg %>% ecdf(.)(.),
+      AvPctl = Avg %>% ecdf(.)(.),   # empirische Verteilungsfunktionen
       HRPctl = HitRt %>% ecdf(.)(.),
       ERPctl = EntRt %>% ecdf(.)(.),
       LRPctl = LocRt %>% ecdf(.)(.))
