@@ -1,10 +1,11 @@
-ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_month = NULL, period = NULL, grp_nm = "Period", reverse = FALSE) {
+ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, ytd_day = NULL, ytd_month = NULL, period = NULL, grp_nm = "Period", reverse = FALSE) {
   # mds_data    mds_data-artige Daten
   # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
+  # ytd_dm      day and month für year-to date-Auswertung
   # ytd_day     year-to-date Tag
   # ytd_month   year-to-date Monat
   # period      gruppierende (Zeit-)Variable
-  # grp_nm      Bezeichnung im Ergebnis
+  # grp_nm      Bezeichnung der gruppierenden Variable im Ergebnis
   # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
   
   # Notwendige libraries
@@ -15,10 +16,12 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   grouping = sym(grp_nm)
   grouping_nm = as_label(grouping)
   
-  # Auswahl der Periode 
-  period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
-  
+  # Auswahl Spezialfall year-to-date
+  if(!is.null(ytd_dm)) ytd <- TRUE
   if(ytd) period <- "year" # für year-to-date
+
+  # Auswahl der Periode
+  period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
   if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")] # wenn keine Auswahl im Funktionsaufruf
   if(identical(period, character(0))) return(NULL) # beende Funktion wenn keine Auswahl (= 0)
   
@@ -35,35 +38,39 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
   
   # year-to-date
   if(ytd) {
-    if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(tzone = "CET"), "%d"))
-    if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(tzone = "CET"), "%m"))
-    d <- ytd_day; m <- ytd_month
+    # if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(tzone = "CET"), "%d")); cat("1")
+    # if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(tzone = "CET"), "%m")); cat("2")
+    ytd_dm <- if(is.null(ytd_dm)) today(tzone = "CET") else
+       dmy(paste(ytd_dm, "2000"))
+    # d <- day(ytd_dm); m <- month(ytd_dm)
     tmp <- tmp %>% 
-      filter(month(Date) < m | (month(Date) == m & day(Date) <= d))
-  }
+      filter(month(Date) < month(ytd_dm) | (month(Date) == month(ytd_dm) & day(Date) <= day(ytd_dm)))
+    }
   
   # Spezialfälle 
   skip <- FALSE
-  if(period == "day") {
-    tmp <- tmp %>% rename(!!grouping_nm := Date)
-    skip <- TRUE
-  }
-  if(period == "weekday") {
-    tmp <- tmp %>% mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) %>%
-                            ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
-    skip <- TRUE
-  }
-  if(period == "overall") {
-    tmp <- tmp %>% mutate(!!grouping_nm := "overall")
-    skip <- TRUE
-  }
-  # Quasi: else-Zweig der Spezialfälle
+  switch(period,
+         "day" = {
+           tmp <- tmp |>  rename(!!grouping_nm := Date); 
+           skip <- TRUE
+           },
+         "weekday" = {
+           tmp <- tmp |>  mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) |> 
+                                   ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
+         skip <- TRUE
+         },
+         "overall" = {
+           tmp <- tmp %>% mutate(!!grouping_nm := "overall")
+           skip <- TRUE
+           })
+
+    # Quasi: else-Zweig der Spezialfälle
   if(!skip) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
   
+  # Zusammenfassen entsprechend Periode
   tmp <- tmp %>% 
     group_by(!!grouping) %>% 
-    # Zusammenfassen entsprechend Periode
     summarise(Deno = list(Reduce(`+`, Deno)),
               Loc = list(Reduce(union, Loc)),
               Days = n(),
@@ -117,7 +124,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_day = NULL, ytd_mo
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   }
   if(ytd) {
-    tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(ytd_month, 2, pad = "0"), "-", str_pad(ytd_day, 2, pad = "0")))
+    tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(month(ytd_dm), 2, pad = "0"), "-", str_pad(day(ytd_dm), 2, pad = "0")))
   }
   
   # Umkehren der Reihenfolge (letzte oben)
