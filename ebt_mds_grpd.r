@@ -43,24 +43,14 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     }
   
   # Spezialfälle 
-  skip <- FALSE
   switch(period,
-         "day" = {
-           tmp <- tmp |>  rename(!!grouping_nm := Date); 
-           skip <- TRUE
-           },
-         "weekday" = {
-           tmp <- tmp |>  mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) |> 
-                                   ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
-         skip <- TRUE
-         },
-         "overall" = {
-           tmp <- tmp %>% mutate(!!grouping_nm := "overall")
-           skip <- TRUE
-           })
-
-    # Quasi: else-Zweig der Spezialfälle
-  if(!skip) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
+         day = tmp <- tmp |>  rename(!!grouping_nm := Date),
+         weekday = tmp <- tmp |>  mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) |> 
+                                   ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))),
+         overall = tmp <- tmp %>% mutate(!!grouping_nm := "overall"))
+  
+  # Quasi: else-Zweig der Spezialfälle
+  if(!(period %in% c("day", "weekday", "overall"))) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
   
   # Zusammenfassen entsprechend Periode
