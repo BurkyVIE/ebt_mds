@@ -58,8 +58,8 @@ p <- ggplot() +
   geom_sf(data = visited, mapping = aes(fill = Country), show.legend = FALSE, color = NA, alpha = 3/10) +
   geom_sf(data = map_eu %>% filter(geounit == "Austria"), color = cols[2], linewidth = 3/2, fill = NA) +
   geom_sf(data = locs, mapping = aes(color = Country), show.legend = FALSE, size = 5/4, alpha = 1/3) +
-  scale_x_continuous(expand = c(.01, .01)) +
-  scale_y_continuous(expand = c(.01, .01)) +
+  scale_x_continuous(expand = expansion(add = .01), labels = (\(x) paste0(x,'°E'))) + # solves problems with incorrect interpretation of 'degrees'
+  scale_y_continuous(expand = expansion(add = .01), labels = (\(y) paste0(y,'°N'))) +
   scale_color_manual(values = ccol) +
   scale_fill_manual(values = ccol) +
   labs(title = "EuroBillTracker - Dots and Locations in and about AT",
