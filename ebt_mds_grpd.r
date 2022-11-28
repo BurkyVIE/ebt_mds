@@ -36,11 +36,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   
   # year-to-date
   if(ytd) {
-    # if(is.null(ytd_day)) ytd_day <- as.numeric(format(today(tzone = "CET"), "%d")); cat("1")
-    # if(is.null(ytd_month)) ytd_month <- as.numeric(format(today(tzone = "CET"), "%m")); cat("2")
     ytd_dm <- if(is.null(ytd_dm)) today(tzone = "CET") else
        dmy(paste(ytd_dm, "2000")) # 2000 war ein Schaltjahr
-    # d <- day(ytd_dm); m <- month(ytd_dm)
     tmp <- tmp %>% 
       filter(month(Date) < month(ytd_dm) | (month(Date) == month(ytd_dm) & day(Date) <= day(ytd_dm)))
     }
