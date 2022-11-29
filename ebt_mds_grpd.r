@@ -1,4 +1,5 @@
 ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period = NULL, grp_nm = "Period", reverse = FALSE) {
+  # Definition der Parameter ----
   # mds_data    mds_data-artige Daten
   # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
   # ytd_dm      day and month für year-to date-Auswertung
@@ -6,35 +7,31 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   # grp_nm      Bezeichnung der gruppierenden Variable im Ergebnis
   # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
   
-  # Notwendige libraries
+  # Initialisierung ----
+  ## Libraries ----
   library(tidyverse)
   library(lubridate)
   
-  # Evaluation der Gruppe/des Gruppennamens
+  ## Evaluation der Gruppe/des Gruppennamens ----
   grouping = sym(grp_nm)
   grouping_nm = as_label(grouping)
   
-  # Spezialfall year-to-date
-  if(!is.null(ytd_dm)) ytd <- TRUE
-  if(ytd) period <- "year" # für year-to-date
-
-  # Auswahl der Periode
-  period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
-  if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")] # wenn keine Auswahl im Funktionsaufruf
-  if(identical(period, character(0))) return(NULL) # beende Funktion wenn keine Auswahl (= 0)
-  
-  # Erstelle vollständige Liste der möglichen Daten (= Datümer)
-  c(today(tzone = "CET"),                # bis inkl heute ... --- CET weil in Arbeit keine std-tz gesetzt
-    pull(mds_data, Date)) |>             # aus den Eingabezeitpunkten ...
+  ## Erstelle vollständige Liste der möglichen Daten (= Datümer) ----
+  tmp <- c(today(tzone = "CET"),         # bis inkl heute ... --- CET weil in Arbeit keine std-tz gesetzt
+           pull(mds_data, Date)) |>      # aus den Eingabezeitpunkten ...
     full_seq(1) |>                       # einen Vektor aller möglichen Zeitpunkte erzeugen ...
     (\(d) tibble("Date" = d))() |>       # in einen Tibble umwandeln (anonymous function) ...
     left_join(mds_data, by = "Date") |>  # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer (inkl NA in 0) um
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
            Hits = as.integer(Hits)) %>%
-    replace_na(list(Hits = 0L)) -> tmp
-  
-  # year-to-date
+    replace_na(list(Hits = 0L))
+
+  # Periodenauswahl ----
+  ## Spezialfall year-to-date ----
+  if(!is.null(ytd_dm)) ytd <- TRUE
+  if(ytd) period <- "year"
+  # Finde korrektes Datum für year-to-date
   if(ytd) {
     ytd_dm <- if(is.null(ytd_dm)) today(tzone = "CET") else
        dmy(paste(ytd_dm, "2000")) # 2000 war ein Schaltjahr
@@ -42,7 +39,13 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
       filter(month(Date) < month(ytd_dm) | (month(Date) == month(ytd_dm) & day(Date) <= day(ytd_dm)))
     }
   
-  # Spezialfälle
+  ## Auswahl der Periode ----
+  period_list = c("overall", "weekday", "day", "week", "month", "quarter", "halfyear", "year")
+  if(is.null(period)) period <- period_list[menu(period_list, title = "choose period")] # wenn keine Auswahl im Funktionsaufruf
+  if(identical(period, character(0))) return(NULL) # beende Funktion wenn keine Auswahl (= 0)
+  
+  # Zusammenfassen/ Ableiten ----
+  ## Spezialfälle ----
   if(period %in% c("day", "weekday", "overall")) {
     tmp <- switch(period,
                   day = rename(.data = tmp, !!grouping_nm := Date),
@@ -52,11 +55,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     } else
     tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   
-  # # Quasi: else-Zweig der Spezialfälle
-  # if(!(period %in% c("day", "weekday", "overall"))) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
-  # # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
-  
-  # Zusammenfassen entsprechend Periode
+  ## Zusammenfassen entsprechend Periode ----
   tmp <- tmp %>% 
     group_by(!!grouping) %>% 
     summarise(Deno = list(Reduce(`+`, Deno)),
@@ -65,7 +64,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
               Hits = sum(Hits, na.rm = TRUE),
               .groups = "drop")
   
-  # Diverse Ableitungen
+  ## Diverse Ableitungen ----
   tmp <- tmp %>% 
     mutate(map2_df(                                                   # map2 auf ...
       map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), # 1) expandierte Denos (eigenes map) und ...
@@ -83,7 +82,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
              .fns = ~ rank(., ties.method = "max", na.last = "keep") / sum(!is.na(.)),
              .names = "{.col}Pctl"))
   
-  # Labels
+  ## Vergabe Label (= Benennung dewr entsprechenden Periode) ----
   if(period == "weekday")
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
    if(period == "week")
@@ -105,11 +104,11 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   if(ytd)
     tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(month(ytd_dm), 2, pad = "0"), "-", str_pad(day(ytd_dm), 2, pad = "0")))
   
-  # Umkehren der Reihenfolge (letzte oben)
+  ## Umkehren der Reihenfolge (letzte oben) ----
   if(reverse) tmp <- tmp %>%
     arrange(desc(!!grouping))
   
-  # Rückgabe
+  # Rückgabe ----
   return(tmp)
   rm(tmp)
 }
