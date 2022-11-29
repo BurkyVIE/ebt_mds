@@ -85,7 +85,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   ## Vergabe Label (= Benennung dewr entsprechenden Periode) ----
   if(period == "weekday")
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
-   if(period == "week")
+  if(period == "week")
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y W%V")) %>% relocate(Label, .after = Loc)
   if(period == "month")
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = Loc)
@@ -99,6 +99,8 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " / ", c("I", "II")[semester(!!grouping)])) %>% relocate(Label, .after = Loc)
   if(period == "year")
     tmp <- tmp %>% mutate(Label = year(!!grouping)) %>% relocate(Label, .after = Loc)
+  if(period %in% c("5 year", "5 years"))
+    tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), "..", year(!!grouping) %% 10 + 4)) %>% relocate(Label, .after = Loc)
   if(period %in% c("10 year", "10 years"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
   if(ytd)
