@@ -42,16 +42,19 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
       filter(month(Date) < month(ytd_dm) | (month(Date) == month(ytd_dm) & day(Date) <= day(ytd_dm)))
     }
   
-  # Spezialfälle 
-  switch(period,
-         day = tmp <- tmp |>  rename(!!grouping_nm := Date),
-         weekday = tmp <- tmp |>  mutate(!!grouping_nm := lubridate::wday(x = Date, week_start = 1, label = TRUE) |> 
-                                   ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))),
-         overall = tmp <- tmp %>% mutate(!!grouping_nm := "overall"))
+  # Spezialfälle
+  if(period %in% c("day", "weekday", "overall")) {
+    tmp <- switch(period,
+                  day = rename(.data = tmp, !!grouping_nm := Date),
+                  weekday = mutate(.data = tmp, !!grouping_nm := wday(x = Date, week_start = 1, label = TRUE) |> 
+                                     ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))),
+                  overall = mutate(.data = tmp, !!grouping_nm := "overall"))
+    } else
+    tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   
-  # Quasi: else-Zweig der Spezialfälle
-  if(!(period %in% c("day", "weekday", "overall"))) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
-  # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
+  # # Quasi: else-Zweig der Spezialfälle
+  # if(!(period %in% c("day", "weekday", "overall"))) tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
+  # # ceiling_date(Date, unit = period, week_start = 1) - days(1) ... führt leider zu ungewohnten Effekten in Grafiken
   
   # Zusammenfassen entsprechend Periode
   tmp <- tmp %>% 
@@ -81,36 +84,26 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
              .names = "{.col}Pctl"))
   
   # Labels
-  if(period == "weekday") {
+  if(period == "weekday")
     tmp <- tmp %>% mutate(Label = str_sub(!!grouping, 1, 3)) %>% relocate(Label, .after = Loc)
-  }
-  if(period == "week") {
+   if(period == "week")
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y W%V")) %>% relocate(Label, .after = Loc)
-  }
-  if(period == "month") {
+  if(period == "month")
     tmp <- tmp %>% mutate(Label = strftime(!!grouping, "%Y-%m")) %>% relocate(Label, .after = Loc)
-  }
-  if(period %in% c("2 month", "2 months")) {
+  if(period %in% c("2 month", "2 months"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(!!grouping) - 1) %/% 2 + 1, "/6")) %>% relocate(Label, .after = Loc)
-  }
-  if(period %in% c("quarter", "3 month")) {
+  if(period %in% c("quarter", "3 month"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " Q", quarter(!!grouping))) %>% relocate(Label, .after = Loc)
-  }
-  if(period %in% c("4 month", "4 months")) {
+  if(period %in% c("4 month", "4 months"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " ", (month(!!grouping) - 1) %/% 4 + 1, "/3")) %>% relocate(Label, .after = Loc)
-  }
-  if(period %in% c("halfyear", "6 month", "6 months")) {
+  if(period %in% c("halfyear", "6 month", "6 months"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping), " / ", c("I", "II")[semester(!!grouping)])) %>% relocate(Label, .after = Loc)
-  }
-  if(period == "year") {
+  if(period == "year")
     tmp <- tmp %>% mutate(Label = year(!!grouping)) %>% relocate(Label, .after = Loc)
-  }
-  if(period %in% c("10 year", "10 years")) {
+  if(period %in% c("10 year", "10 years"))
     tmp <- tmp %>% mutate(Label = paste0(year(!!grouping) %/% 10, "0s")) %>% relocate(Label, .after = Loc)
-  }
-  if(ytd) {
+  if(ytd)
     tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(month(ytd_dm), 2, pad = "0"), "-", str_pad(day(ytd_dm), 2, pad = "0")))
-  }
   
   # Umkehren der Reihenfolge (letzte oben)
   if(reverse) tmp <- tmp %>%
