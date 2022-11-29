@@ -1,11 +1,11 @@
 ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period = NULL, grp_nm = "Period", reverse = FALSE) {
   # Definition der Parameter ----
-  # mds_data    mds_data-artige Daten
-  # ytd         year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
-  # ytd_dm      day and month für year-to date-Auswertung
-  # period      gruppierende (Zeit-)Variable
-  # grp_nm      Bezeichnung der gruppierenden Variable im Ergebnis
-  # reverse     Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
+  # mds_data ... mds_data-artige Daten
+  # ytd      ... year-to-date Auswertung; Parameter 'period' und 'grp_nm' werden ignoriert
+  # ytd_dm   ... day and month für year-to date-Auswertung
+  # period   ... gruppierende (Zeit-)Variable
+  # grp_nm   ... Bezeichnung der gruppierenden Variable im Ergebnis
+  # reverse  ... Umkehren der Reihenfolge im Ergebnis (= jüngster Zeitraum zuerst)
   
   # Initialisierung ----
   ## Libraries ----
