@@ -50,7 +50,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     tmp <- switch(period,
                   day = rename(.data = tmp, !!grouping_nm := Date),
                   weekday = mutate(.data = tmp, !!grouping_nm := wday(x = Date, week_start = 1, label = TRUE) |> 
-                                     ordered(labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))),
+                                     ordered(labels = date_names_lang("en")$day[c(2:7, 1)])),
                   overall = mutate(.data = tmp, !!grouping_nm := "overall"))
     } else
     tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
