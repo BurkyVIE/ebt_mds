@@ -56,8 +56,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
   
   ## Zusammenfassen entsprechend Periode ----
-  tmp <- tmp %>% 
-    group_by(!!grouping) %>% 
+  tmp <- group_by(.data = tmp, !!grouping) |>
     summarise(Deno = list(Reduce(`+`, Deno)),
               Loc = list(Reduce(union, Loc)),
               Days = n(),
@@ -65,22 +64,21 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
               .groups = "drop")
   
   ## Diverse Ableitungen ----
-  tmp <- tmp %>% 
-    mutate(map2_df(                                                   # map2 auf ...
-      map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), # 1) expandierte Denos (eigenes map) und ...
-      Loc,                                                            # 2) Locations ...
-      ~ data.frame(Count = length(.x),                                # eine Reihe von Funktionen gleichzeitig
-                   Value = as.integer(sum(.x)),
-                   nLoc = length(.y),
-                   Avg = mean(.x),
-                   Med = median(.x),
-                   SD = sd(.x))),
-      HitRt = Count / Hits, # Ableitungen
-      EntRt = Count / Days,
-      LocRt = nLoc / Days,
-      across(.cols = c(Av = Avg, HR = HitRt, ER = EntRt, LR = LocRt), # empirische Verteilungsfunktionen - was ecdf(.)(.)
-             .fns = ~ rank(., ties.method = "max", na.last = "keep") / sum(!is.na(.)),
-             .names = "{.col}Pctl"))
+  tmp <- mutate(.data = tmp, map2_df(                               # map2 auf ...
+    map(.x = Deno, .f = ~ rep(c(5, 10, 20, 50, 100, 200, 500), .)), # 1) expandierte Denos (eigenes map) und ...
+    Loc,                                                            # 2) Locations ...
+    ~ data.frame(Count = length(.x),                                # eine Reihe von Funktionen gleichzeitig
+                 Value = as.integer(sum(.x)),
+                 nLoc = length(.y),
+                 Avg = mean(.x),
+                 Med = median(.x),
+                 SD = sd(.x))),
+    HitRt = Count / Hits, # Ableitungen
+    EntRt = Count / Days,
+    LocRt = nLoc / Days,
+    across(.cols = c(Av = Avg, HR = HitRt, ER = EntRt, LR = LocRt), # empirische Verteilungsfunktionen - was ecdf(.)(.)
+           .fns = ~ rank(., ties.method = "max", na.last = "keep") / sum(!is.na(.)),
+           .names = "{.col}Pctl"))
   
   ## Vergabe Label (= Benennung dewr entsprechenden Periode) ----
   if(period == "weekday")
@@ -107,8 +105,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     tmp <- tmp %>% mutate(Label = paste0("YTD ", Label, "-", str_pad(month(ytd_dm), 2, pad = "0"), "-", str_pad(day(ytd_dm), 2, pad = "0")))
   
   ## Umkehren der Reihenfolge (letzte oben) ----
-  if(reverse) tmp <- tmp %>%
-    arrange(desc(!!grouping))
+  if(reverse) tmp <- arrange(.data = tmp, desc(!!grouping))
   
   # Rückgabe ----
   return(tmp)
