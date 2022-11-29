@@ -14,7 +14,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   grouping = sym(grp_nm)
   grouping_nm = as_label(grouping)
   
-  # Auswahl Spezialfall year-to-date
+  # Spezialfall year-to-date
   if(!is.null(ytd_dm)) ytd <- TRUE
   if(ytd) period <- "year" # für year-to-date
 
