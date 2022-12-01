@@ -20,28 +20,15 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
                             Change == 0 ~ "equal"))
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
-# Loakale Extrema
-n_extr <- 7
-extreme <- mutate(dat,
-                  Extreme = case_when(Change == "lower" ~ "-",
-                                      Change == "higher" ~ "+",
-                                      TRUE ~ "0"),
-                  # Extreme = paste0(lag(Extreme, 5), lag(Extreme, 4), lag(Extreme, 3), lag(Extreme, 2), lag(Extreme, 1),
-                  Extreme = paste0(map_dfc(set_names(n_extr:1, letters[1:n_extr]), .f = ~ lag(Extreme, .), ) |> (\(x) apply(x, 1, paste, collapse = ""))(),
-                                   Extreme,
-                                   map_dfc(set_names(1:n_extr, letters[1:n_extr]), .f = ~ lead(Extreme, .)) |> (\(x) apply(x, 1, paste, collapse = ""))())) |> 
-  filter(Extreme %in% c(paste(c(rep("-", n_extr + 1), rep("+", n_extr)), collapse = ""), paste(c(rep("+", n_extr + 1), rep("-", n_extr)), collapse = "")))
-
 spec0 <- filter(dat, is.finite(cHitRt))
 
 spec <- bind_rows(
   filter(spec0, row_number() == 1),
   filter(spec0, cHitRt == min(cHitRt)),
   filter(spec0, cHitRt == max(cHitRt)),
-  filter(spec0, row_number() == n()),
-  extreme) |>
+  filter(spec0, row_number() == n())) |>
   mutate(Label = format(cHitRt, trim = TRUE, digits = 2, nsmall = 2, big.mark = ","),
-         Label = paste(c("first", "lowest", "highest", "latest", rep("local extreme", tally(extreme))), Label, sep = ": "))
+         Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
   
 # PLOT ----
 p <- ggplot(data = dat) +
