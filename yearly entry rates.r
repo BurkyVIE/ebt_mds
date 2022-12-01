@@ -46,7 +46,7 @@ he |>
   ungroup() |>  
   ggplot() +
   aes(x = Time, y = cumCount) +
-  geom_abline(slope = slopes$slope, color = "white", linetype = "dashed") +
+  geom_abline(slope = slopes$slope, color = "white", linetype = "dashed", linewidth = 1) +
   geom_label(data = slopes, mapping = aes(x = x, y = y, label = label), color = "white", fill = "grey", alpha = .6) +
   geom_line(mapping = aes(color = factor(Year), group = Year), linewidth = 2.5, alpha = .6) +
   scale_color_brewer(name = "", palette = "Set1", direction = -1) +
