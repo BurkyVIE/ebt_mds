@@ -15,9 +15,9 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 5),
          Change = c(NaN, sign(diff(cHitRt))),
-         Change_lit = case_when(Change < 1 ~ "lower",
-                            Change > 1 ~ "higher",
-                            TRUE ~ "equal"))
+         Change_lit = case_when(Change < 0 ~ "lower",
+                            Change > 0 ~ "higher",
+                            Change == 0 ~ "equal"))
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
 # Loakale Extrema
