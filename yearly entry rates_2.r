@@ -37,7 +37,7 @@ dat |>
   aes(x = Time, y = cumEntRt) +
   geom_line(mapping = aes(color = factor(Year), group = Year), linewidth = 1.5,  alpha = .67) +
   scale_color_brewer(name = "", palette = "Set1", direction = -1) +
-  gghighlight(max(Year), max_highlight = 3, label_key = Year,
+  gghighlight(max(Year), max_highlight = last, label_key = Year,
               unhighlighted_params = list(linewidth = .5, color = "grey")) +
   scale_x_continuous(name = paste0("Time Elapsed (", str_to_title(param$period), "s)"), breaks = function(x)seq(0, x[2], by = param$by), expand = expansion(mult = c(0, .01))) +
   scale_y_continuous(name = "Cumulative Entry Rate [k]", labels = function(x) x / 1000, expand = expansion(mult = .02)) +
