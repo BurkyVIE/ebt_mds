@@ -16,7 +16,6 @@ param <- list(list(period = "day", slope_fac = 1, xmax = 365, y_fn = function(x)
 # t_fn      ... Berechnung der x-Abschnitte
 # by        ... Beschriftungsabstände auf der x-Achse
 
-
 ## Highlighten der letzten ... ----
 last <- 3
 
@@ -28,18 +27,19 @@ slopes <- tibble(slope0 = c(50, 100, 200, 300)) %>%
 
 # Berechnungen ----
 ## Bereitstellung Daten ----
-he <- ebt_mds_grpd(period = param$period) |> 
+dat <- ebt_mds_grpd(period = param$period) |> 
   select(Period, Count) |> 
   mutate(Year = param$y_fn(Period),
          Time = param$t_fn(Period))
+
 ## Ableitungen ----
-he |> 
+dat |> 
   group_by(Year) |> 
   summarise(Year = first(Year),
             Time = min(Time)-1,
             Count = 0,
             .groups = "drop") |> 
-  (\(x) bind_rows(he, x))() |> 
+  (\(x) bind_rows(dat, x))() |> 
   arrange(Year, Time) |>
   group_by(Year) |> 
   mutate(cumCount = cumsum(Count)) |> 
@@ -64,4 +64,4 @@ windows(16, 9)
 plot(p)
 
 # Aufräumen ----
-rm(param, last, slopes, he, p)
+rm(param, last, slopes, dat, p)
