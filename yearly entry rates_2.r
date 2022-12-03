@@ -10,7 +10,6 @@ param <- list(list(period = "day", xmax = 365, y_fn = function(x) year(x), t_fn 
               list(period = "month", xmax = 12, y_fn = function(x) year(x), t_fn = function(x) month(x), by = 2)
               )[[1]] # <- HIER Schalter!
 # period    ... Für die ebt_mds_grp- Abfrage und für die Beschriftung x-Achse
-# slope_fac ... Korrektur für Steigung der Hilfslinien i.e. Tage pro Abschnitt
 # xmax      ... x-Achsen-Korrektur für Labels Hilfslinien
 # y_fn      ... Funktion zur Berechnung des Jahres (Gruppierung)
 # t_fn      ... Berechnung der x-Abschnitte
