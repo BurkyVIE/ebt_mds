@@ -39,7 +39,7 @@ dat |>
   gghighlight(max(Year), max_highlight = last, label_key = Year,
               unhighlighted_params = list(linewidth = .5, color = "grey")) +
   scale_x_continuous(name = paste0("Time Elapsed (", str_to_title(param$period), "s)"), breaks = function(x)seq(0, x[2], by = param$by), expand = expansion(mult = c(0, .01))) +
-  scale_y_continuous(name = "Cumulative Entry Rate [k]", expand = expansion(mult = .02)) +
+  scale_y_continuous(name = "Cumulative Entry Rate", expand = expansion(mult = .02)) +
   labs(title = "EuroBillTracker - Aggregation of Entries over the Years",
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date), " (https://www.eurobilltracker.com)")) +
