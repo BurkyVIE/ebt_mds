@@ -1,8 +1,10 @@
 # Initialisierung ----
 ## Libraries ----
-library(tidyverse)
-library(gghighlight)
-library(lubridate)
+{
+  library(tidyverse)
+  library(gghighlight)
+  library(lubridate)
+}
 
 ## Parameter für Betrachtungsweise ----
 param <- list(list(period = "day", xmax = 365, y_fn = function(x) year(x), t_fn = function(x) yday(x), by = 60),
