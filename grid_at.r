@@ -1,7 +1,9 @@
 # libraries ----
-library(tidyverse)
-library(rnaturalearth)
-library(sf)
+{
+  library(tidyverse)
+  library(rnaturalearth)
+  library(sf)
+}
 
 # definitions ----
 ## colors ----
