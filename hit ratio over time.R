@@ -14,7 +14,7 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
          cHits = cumsum(Hits),
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 5),
-         Change = c(NaN, sign(diff(cHitRt))),
+         Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf drei Nachkommestellen
          Change_lit = case_when(Change < 0 ~ "lower",
                             Change > 0 ~ "higher",
                             Change == 0 ~ "equal"))
