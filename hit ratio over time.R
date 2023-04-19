@@ -52,3 +52,17 @@ plot(p)
 
 # CLEAN UP ----
 rm(cuts, dat, n_extr, extreme, spec0, spec, p)
+
+
+
+# Graph max and min
+# dat |>
+#   select(Date, cHitRt) |>
+#   mutate(cMin = cummin(cHitRt),
+#          cMax = rev(cummax(rev(cHitRt)))) |>
+#   ggplot() +
+#   aes(x = Date) +
+#   geom_line(aes(y = cHitRt), linewidth = 2, col = "gold") +
+#   geom_line(aes(y = cMin), color = "forestgreen") +
+#   geom_line(aes(y = cMax), color = "firebrick") +
+#   scale_y_log10()
