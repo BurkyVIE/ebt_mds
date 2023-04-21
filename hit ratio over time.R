@@ -14,7 +14,7 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
          cHits = cumsum(Hits),
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 3),
-         Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf drei Nachkommestellen
+         Change = c(NaN, sign(diff(cHitRtLong))),  # Differenz auf drei Nachkommastellen aus cHitRtLong
          Change_lit = c("lower", "equal", "higher")[Change + 2])
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
