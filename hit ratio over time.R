@@ -10,8 +10,7 @@ cuts <- list(
 # DATA ----
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   select(Date, Count, Hits, HitRt) |>
-  mutate(cCount = cumsum(Count),
-         cHits = cumsum(Hits),
+  mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 3),
          Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
