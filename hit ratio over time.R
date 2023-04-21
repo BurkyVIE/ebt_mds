@@ -13,11 +13,9 @@ dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   mutate(cCount = cumsum(Count),
          cHits = cumsum(Hits),
          cHitRt = cCount / cHits,
-         cHitRtLong = num(cHitRt, digits = 5),
+         cHitRtLong = num(cHitRt, digits = 3),
          Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf drei Nachkommestellen
-         Change_lit = case_when(Change < 0 ~ "lower",
-                            Change > 0 ~ "higher",
-                            Change == 0 ~ "equal"))
+         Change_lit = c("lower", "equal", "higher")[Change + 2])
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
 spec0 <- filter(dat, is.finite(cHitRt))
