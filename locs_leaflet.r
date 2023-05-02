@@ -1,5 +1,6 @@
 # Libraries ----
 library(leaflet)
+library(sf)
 
 # Locations ----
 locs <- pseudo %>%
