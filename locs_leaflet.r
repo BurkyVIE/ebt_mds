@@ -6,13 +6,21 @@ locs <- pseudo %>%
   st_as_sf(coords = c("Long", "Lat"), crs = 4326) %>%
   st_set_agr(., "constant")
 
+# https://forum.eurobilltracker.com/viewtopic.php?t=5229&postdays=0&postorder=asc&start=9
+# For reference, here are the current parameters for the grid:
+#   Europe:
+# - minimum latitude: 29
+# - maximum latitude: 71
+# - minimum longitude: -12
+# - maximum longitude: 54
+# - grid size: 157 x 150 (up from 150x150)
+
 ## enlarge raster ----
 i <- 50
 
 # initialization ----
-## EBT-Grid of/around austria (based on europe-grid) ----
-raster <- list(long = seq(-12 + (51-i) * 66/157, -12 + (69+i) * 66/157, length = 19+2*i), 
-               lat = seq(29 + (62-i) * 42/150, 29 + (71+i) * 42/150, length = 10+2*i))
+raster <- list(long = seq(-12, 54, length = 158), 
+               lat = seq(29, 71, length = 151))
 grid <- crossing(lat = raster$lat,
                  long = raster$long) %>%
   rowid_to_column(var = "ID") %>% 
@@ -33,16 +41,18 @@ leaflet() |>
   addTiles() |> 
   addCircleMarkers(data = locs,
              label = paste(locs$ZIP, locs$City), 
-             weight = 3,
-             radius = 7,
-             color = "red",
+             weight = 2,
+             radius = 5,
+             color = "navy",
              group = "Locs") |> 
   addPolygons(data = grid,
-              weight = 1,
+              weight = .5,
+              color = "red",
               fill = FALSE,
               group = "Dots") |> 
   addPolygons(data = visited,
-              weight = 1,
+              weight = .5,
+              color = "gold",
               group = "Visit")
 
 rm(locs, grid, visited)
