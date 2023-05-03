@@ -44,7 +44,7 @@ leaflet() |>
               fill = FALSE,
               group = "Dots") |> 
   addPolygons(data = visited,
-              weight = .5,
+              weight = 0,
               color = "navy",
               group = "Visit") |> 
   addCircleMarkers(data = locs,
