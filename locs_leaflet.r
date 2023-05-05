@@ -37,22 +37,31 @@ visited <- st_join(grid, locs, join = st_covers) %>%
 
 # Plot ----
 leaflet() |> 
-  addTiles() |> 
+  addTiles(group = "OSM (default)") |> 
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
   addPolygons(data = grid,
-              weight = .5,
+              weight = 1,
               color = "red",
               fill = FALSE,
-              group = "Dots") |> 
+              group = "Dots - Europe") |> 
   addPolygons(data = visited,
               weight = 0,
               color = "navy",
-              group = "Visit") |> 
+              group = "Visited Dots") |> 
   addCircleMarkers(data = locs,
                    label = paste(locs$ZIP, locs$City), 
                    weight = 2,
-                   radius = 5,
+                   radius = 21,
                    color = "navy",
-                   group = "Locs")
+                   group = "Locations",
+                   clusterOptions = markerClusterOptions(),
+                   labelOptions = labelOptions()) |> 
+  addLayersControl(baseGroups = c("OSM (default)", "Toner Lite"),
+                   overlayGroups = c("Dots - Europe", "Visited Dots", "Locations"),
+                   options = layersControlOptions(collapsed=FALSE)) |> 
+  hideGroup("Locations")
+
+# saveWidget(map, file = "map1.html", selfcontained = FALSE)
 
 # Clean up ----
 rm(locs, raster, grid, visited)
