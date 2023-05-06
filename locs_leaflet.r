@@ -21,6 +21,7 @@ locs <- pseudo %>%
 # Grid ----
 raster <- list(long = seq(-12, 54, length = 158), 
                lat = seq(29, 71, length = 151))
+
 grid <- crossing(lat = raster$lat,
                  long = raster$long) %>%
   rowid_to_column(var = "ID") %>% 
@@ -56,7 +57,7 @@ leaflet() |>
                    color = "navy",
                    group = "Locations",
                    clusterOptions = markerClusterOptions(),
-                   labelOptions = labelOptions()) |> 
+                   labelOptions = labelOptions(textsize = "12px")) |> 
   addLayersControl(baseGroups = c("OSM (default)", "Toner Lite"),
                    overlayGroups = c("Dots - Europe", "Visited Dots", "Locations"),
                    options = layersControlOptions(collapsed=FALSE)) |> 
