@@ -38,7 +38,7 @@ visited <- st_join(grid, locs, join = st_covers) %>%
   unique()
 
 # Plot ----
-leaflet() |> 
+mydotmap<-leaflet() |> 
   addTiles(group = "OSM (default)") |> 
   addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
   addPolygons(data = grid,
@@ -63,7 +63,7 @@ leaflet() |>
                    options = layersControlOptions(collapsed=FALSE)) |> 
   hideGroup("Locations")
 
-# saveWidget(map, file = "map1.html", selfcontained = FALSE)
+htmlwidgets::saveWidget(mydotmap, file = "spec/mydotmap.html", selfcontained = FALSE, title = "MyDotMap - Burky")
 
 # Clean up ----
-rm(locs, raster, grid, visited)
+rm(locs, raster, grid, visited, mydotmap)
