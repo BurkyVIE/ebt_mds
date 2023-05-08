@@ -41,6 +41,7 @@ visited <- st_join(grid, locs, join = st_covers) %>%
 mydotmap<-leaflet() |> 
   addTiles(group = "OSM (default)") |> 
   addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
+  setView(lng = 16.36449, lat = 48.210033, zoom = 7) |> 
   addPolygons(data = grid,
               weight = 1,
               color = "red",
