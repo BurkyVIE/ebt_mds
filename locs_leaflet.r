@@ -4,11 +4,11 @@ library(leaflet)
 library(sf)
 
 # Locations ----
-locs <- pseudo %>%
+locs <- pseudo |> 
   transmute(Loc, Label = paste(ZIP, City), Coords) |> 
-  separate(Coords, into = c("Long", "Lat"), sep = "~", convert = TRUE) %>% 
-  st_as_sf(coords = c("Long", "Lat"), crs = 4326) %>%
-  st_set_agr(., "constant")
+  separate(Coords, into = c("Long", "Lat"), sep = "~", convert = TRUE) |> 
+  st_as_sf(coords = c("Long", "Lat"), crs = 4326) |> 
+  st_set_agr("constant")
 
 # https://forum.eurobilltracker.com/viewtopic.php?t=5229&postdays=0&postorder=asc&start=9
 # For reference, here are the current parameters for the grid:
@@ -23,27 +23,28 @@ locs <- pseudo %>%
 raster <- list(long = seq(-12, 54, length = 158), 
                lat = seq(29, 71, length = 151))
 
-gline <- as_tibble(
+glines <- as_tibble(
   rbind(cbind(x1 = -12, y1 = raster$lat, x2 = 54, y2 = raster$lat),
         cbind(x1 = raster$long, y1 = 29, x2 = raster$long, y2 = 71))
   ) |> 
   mutate(line = pmap(.l = list(x1, y1, x2, y2),
                      .f = ~ st_linestring(rbind(c(..1, ..2), c(..3, ..4))))) |> 
-  st_as_sf(sf_column_name = "line", crs = 4326) %>% 
-  st_set_agr(., "constant")
+  select(-(x1:y2)) |> 
+  st_as_sf(sf_column_name = "line", crs = 4326) |>  
+  st_set_agr("constant")
 
 grid <- crossing(lat = raster$lat,
-                 long = raster$long) %>%
-  rowid_to_column(var = "ID") %>% 
+                 long = raster$long) |> 
+  rowid_to_column(var = "ID") |> 
   mutate(dot = map2(.x = long, .y = lat,   # corners to all squares (must be closed)
-                    .f = ~ matrix(c(..1 + c(0, 1, 1, 0, 0) * 66/157, ..2 + c(0, 0, 1, 1, 0) * 42/150), ncol = 2) %>% list() %>% st_polygon())) %>% 
-  st_as_sf(sf_column_name = "dot", crs = 4326) %>% 
-  st_set_agr(., "constant")
+                    .f = ~ matrix(c(..1 + c(0, 1, 1, 0, 0) * 66/157, ..2 + c(0, 0, 1, 1, 0) * 42/150), ncol = 2) |>  list() |>  st_polygon())) |>  
+  st_as_sf(sf_column_name = "dot", crs = 4326) |>  
+  st_set_agr("constant")
 
 # Dots mit Location ----
-visited <- st_join(grid, locs, join = st_covers) %>%
-  filter(!is.na(Label)) %>% 
-  select(-c(Loc:Label)) %>% # no doubles; also unique next line
+visited <- st_join(grid, locs, join = st_covers) |> 
+  filter(!is.na(Label)) |> 
+  select(-c(Loc:Label)) |> # no doubles; also unique next line
   unique()
 
 # Plot ----
