@@ -23,6 +23,15 @@ locs <- pseudo %>%
 raster <- list(long = seq(-12, 54, length = 158), 
                lat = seq(29, 71, length = 151))
 
+gline <- as_tibble(
+  rbind(cbind(x1 = -12, y1 = raster$lat, x2 = 54, y2 = raster$lat),
+        cbind(x1 = raster$long, y1 = 29, x2 = raster$long, y2 = 71))
+  ) |> 
+  mutate(line = pmap(.l = list(x1, y1, x2, y2),
+                     .f = ~ st_linestring(rbind(c(..1, ..2), c(..3, ..4))))) |> 
+  st_as_sf(sf_column_name = "line", crs = 4326) %>% 
+  st_set_agr(., "constant")
+
 grid <- crossing(lat = raster$lat,
                  long = raster$long) %>%
   rowid_to_column(var = "ID") %>% 
@@ -42,8 +51,8 @@ mydotmap<-leaflet() |>
   addTiles(group = "OSM (default)") |> 
   addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
   setView(lng = 16.36449, lat = 48.210033, zoom = 7) |> 
-  addPolygons(data = grid,
-              weight = 1,
+  addPolylines(data = glines,
+              weight = 2,
               color = "red",
               fill = FALSE,
               group = "Dots - Europe") |> 
@@ -67,4 +76,4 @@ mydotmap<-leaflet() |>
 htmlwidgets::saveWidget(mydotmap, file = "spec/mydotmap.html", selfcontained = FALSE, title = "MyDotMap - Burky")
 
 # Clean up ----
-rm(locs, raster, grid, visited, mydotmap)
+rm(locs, raster, glines, grid, visited, mydotmap)
