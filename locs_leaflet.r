@@ -5,6 +5,7 @@ library(sf)
 
 # Locations ----
 locs <- pseudo %>%
+  transmute(Loc, Label = paste(ZIP, City), Coords) |> 
   separate(Coords, into = c("Long", "Lat"), sep = "~", convert = TRUE) %>% 
   st_as_sf(coords = c("Long", "Lat"), crs = 4326) %>%
   st_set_agr(., "constant")
@@ -32,9 +33,8 @@ grid <- crossing(lat = raster$lat,
 
 # Dots mit Location ----
 visited <- st_join(grid, locs, join = st_covers) %>%
-  filter(!is.na(Loc)) %>% 
-  select(-c(First, Country:Loc)) %>% # no doubles; also unique next line
-  # select(-Country) %>%
+  filter(!is.na(Label)) %>% 
+  select(-c(Loc:Label)) %>% # no doubles; also unique next line
   unique()
 
 # Plot ----
@@ -52,7 +52,7 @@ mydotmap<-leaflet() |>
               color = "navy",
               group = "Visited Dots") |> 
   addCircleMarkers(data = locs,
-                   label = paste(locs$ZIP, locs$City), 
+                   label = locs$Label, 
                    weight = 2,
                    radius = 21,
                    color = "navy",
