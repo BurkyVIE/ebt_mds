@@ -71,7 +71,7 @@ mydotmap<-leaflet() |>
                    labelOptions = labelOptions(textsize = "12px")) |> 
   addLayersControl(baseGroups = c("OSM (default)", "Toner Lite"),
                    overlayGroups = c("Dots - Europe", "Visited Dots", "Locations"),
-                   options = layersControlOptions(collapsed=FALSE)) |> 
+                   options = layersControlOptions(collapsed = FALSE)) |> 
   hideGroup("Locations")
 
 htmlwidgets::saveWidget(mydotmap, file = "spec/mydotmap.html", selfcontained = FALSE, title = "MyDotMap - Burky")
