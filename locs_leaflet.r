@@ -64,7 +64,7 @@ mydotmap<-leaflet() |>
   addCircleMarkers(data = locs,
                    label = locs$Label, 
                    weight = 2,
-                   radius = 21,
+                   radius = 17,
                    color = "navy",
                    group = "Locations",
                    clusterOptions = markerClusterOptions(),
