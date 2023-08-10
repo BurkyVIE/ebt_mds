@@ -1,6 +1,6 @@
 ---
 title: "Burky @ EuroBillTracker"
-subtitle: "https://www.eurobilltracker.com/?referer=32954"
+# subtitle: "https://www.eurobilltracker.com/?referer=32954"
 author: "Burky"
 output:
   word_document:
@@ -11,9 +11,9 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(tidyverse)
-library(lubridate)
-library(flextable)
+invisible(lapply(
+  c("tidyverse", "lubridate", "flextable", "gghighlight"), # packages to load
+  library, character.only = TRUE))
 
 old <- set_flextable_defaults(font.family = "Calibri",
                               table.layout = "autofit",
@@ -60,11 +60,11 @@ stat <- ebt_mds_full %>% summarise(across(.cols = Count:Hits, .fns = ~ sum(., na
 ```
 
 Active contribution to EBT was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occurred on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
-**`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`);
-**`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occurred (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).\
+**`r stat$Count %>% format(big.mark = ",")` bills** (`r (stat$Count / days$total) %>% sprintf(., fmt = '%#.2f')` /day) were entered with a total value of **`r stat$Value %>% format(big.mark = ",")` Euro** (mean = `r (stat$Value / stat$Count) %>% sprintf(., fmt = '%#.2f')`); **`r stat$Hits %>% format(big.mark = ",")` hits** (= `r (stat$Hits / days$total) %>% sprintf(., fmt = '%#.2f')` /day) occurred (hit-ratio = 1 : `r (stat$Count / stat$Hits) %>% sprintf(., fmt = '%#.2f')`).\
 Bills were entered in **`r stat$Loc %>% format(big.mark = ",")`** different **locations**.
 
 \pagebreak
+
 ## Active Periods
 
 Active periods are consecutive days with at least one bill entered. The three longest such periods were:
@@ -106,32 +106,35 @@ Active contribution to EBT was recorded in `r (substr(ebt_mds_full$Date, 1, 4) |
 
 ```{r year1, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
-top <- 3
+last <- 3
 
-p <- ebt_mds_full %>%
-  arrange(Date) %>% 
-  mutate(Year = year(Date),
-         Year2 = case_when(Year < (max(Year) - top + 1) ~ "older",
-                           TRUE ~ as.character(Year)),
-         Course = yday(Date)) %>% 
-  group_by(Year) %>% 
-  mutate(cumCount = cumsum(Count)) %>% 
-  ungroup() %>% 
-  ggplot(data = ., mapping = aes(x = Course, y = cumCount)) +
-#  geom_abline(slope = c(100, 200, 300), color = "grey67", linetype = "dashed", size = 1) +
-  geom_line(mapping = aes(group = Year, color = Year2, size = Year2), alpha = .6) +
-  scale_x_continuous(name = "Course (day of year)", expand = c(.01, .01)) +
-  scale_y_continuous(name = "Cumulative count [k]", labels = function(x) x / 1000, expand = c(.02, .02)) +
+ebt_mds_full |> 
+  select(Date, Count) |> 
+  mutate(Days = 1,
+         Year = year(Date),
+         Time = yday(Date)) |> 
+  group_by(Year) |> 
+  mutate(cumDays = cumsum(Days),
+         cumCount = cumsum(Count),
+         cumEntRt = cumCount / cumDays) |>
+  ungroup() |>
+  ggplot() +
+  aes(x = Time, y = cumEntRt) +
+  geom_line(mapping = aes(color = factor(Year), group = Year), linewidth = 1.5,  alpha = .67) +
+  gghighlight(max(Year), max_highlight = last, label_key = Year,
+              unhighlighted_params = list(linewidth = .5, color = "grey")) +
+  scale_x_continuous(name = paste0("Time Elapsed (Days)"), breaks = function(x) seq(0, x[2], by = 60), expand = expansion(mult = c(0, .01))) +
+  scale_y_continuous(name = "Cumulative Entry Rate", expand = expansion(mult = .02)) +
   scale_color_manual(name = "", values = c(colors[c(7, 4, 1)], "grey85")) +
-  scale_size_manual(name = "", values = c(rep(2.5, top), 1)) +
-  theme_minimal()
+  theme_minimal() -> p
 
 plot(p)
 
-rm(top, p)
+rm(last, p)
 ```
 
 \pagebreak
+
 ## Monthly Activity
 
 Active contribution to EBT was recorded in `r (substr(ebt_mds_full$Date, 1, 7) |> unique() |> length())` different months.\
@@ -166,6 +169,7 @@ The seven months with least entered bills were:
 ```
 
 \pagebreak
+
 Graphical representation of the monthly variation:
 
 ```{r month3, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
@@ -207,6 +211,7 @@ plot(p)
 ```
 
 \pagebreak
+
 ## Denomination
 
 Distribution of entered bills by denomination:
@@ -256,6 +261,7 @@ plot(p)
 ```
 
 \pagebreak
+
 ## Hits
 
 The five longest hit streaks were:
