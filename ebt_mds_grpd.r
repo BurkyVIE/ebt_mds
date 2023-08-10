@@ -24,7 +24,7 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
     left_join(mds_data, by = "Date") |>  # und die Daten zu den Eingabezeitpunkten einfügen.
     # Fülle Deno auf 7 Stellen auf und wandle Hits in integer (inkl NA in 0) um
     mutate(Deno = map(.x = Deno, .f = ~ as.integer(c(., numeric(7))[1:7])),
-           Hits = as.integer(Hits)) %>%
+           Hits = as.integer(Hits)) |>
     replace_na(list(Hits = 0L))
 
   # Periodenauswahl ----
