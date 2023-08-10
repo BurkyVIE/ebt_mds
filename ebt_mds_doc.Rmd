@@ -17,6 +17,7 @@ invisible(lapply(
 
 old <- set_flextable_defaults(font.family = "Calibri",
                               table.layout = "autofit",
+                              theme_fun = theme_booktabs,
                               decimal.mark = ".",
                               big.mark = ",")
 
@@ -24,15 +25,16 @@ colors <- viridis::viridis(7, begin = .05, end = .95)
 
 source("ebt_mds.txt")
 ebt_mds_full <-
-  ebt_mds$Date %>%                    # aus den Eingabezeitpunkten ...
-  full_seq(1) %>%                     # einen Vektor aller moeglichen Zeitpunkte erzeugen ...
-  tibble(Date = .) %>%                # in einen Tibble umwandeln ...
-  left_join(ebt_mds, by = "Date") %>% # und die Daten zu den Eingabezeitpunkten einfuegen.
+  ebt_mds$Date |>                    # aus den Eingabezeitpunkten ...
+  full_seq(1) |>                     # einen Vektor aller moeglichen Zeitpunkte erzeugen ...
+  (\(x) tibble(Date = x))() |>      # in einen Tibble umwandeln ...
+  left_join(ebt_mds, by = "Date") |> # und die Daten zu den Eingabezeitpunkten einfuegen.
   mutate(Day = wday(x = Date, week_start = 1, label = TRUE, locale = "English"),
-         Deno = map(.x = Deno, .f = function(x = .) c(x, double(7 - length(x))) %>% as.integer()),
+         Deno = map(.x = Deno, .f = function(x = .) c(x, double(7 - length(x))) |> as.integer()),
          Count = map_int(.x = Deno, .f = ~ sum(.)),
-         Value = map_dbl(.x = Deno, .f = ~ (t(.) %*% c(5L, 10L, 20L, 50L, 100L, 200L, 500L)) %>% as.integer()),
-         nLoc = map_int(.x = Loc, .f = ~ length(.))) %>%
+         Value = map_dbl(.x = Deno, .f = ~ (t(.) %*% c(5L, 10L, 20L, 50L, 100L, 200L, 500L)) |> as.integer()),
+         nLoc = map_int(.x = Loc, .f = ~ length(.))
+         ) |>
   select(Date, Day, Deno, Count, Value, Hits, Loc, nLoc)
 ```
 
@@ -50,13 +52,13 @@ EuroBillTracker (EBT) is an international non-profit volunteer team dedicated to
 
 ```{r general, include=FALSE}
 
-days <- tibble(ebt_mds_full %>% count(name = "total"),
-               ebt_mds_full %>% filter(Count > 0) %>% count(name = "bills"),
-               ebt_mds_full %>% filter(Hits > 0) %>% count(name = "hits"))
+days <- tibble(ebt_mds_full |> count(name = "total"),
+               ebt_mds_full |> filter(Count > 0) |> count(name = "bills"),
+               ebt_mds_full |> filter(Hits > 0) |> count(name = "hits"))
 
-stat <- ebt_mds_full %>% summarise(across(.cols = Count:Hits, .fns = ~ sum(., na.rm = TRUE)), .groups = "drop") %>%
+stat <- ebt_mds_full |> summarise(across(.cols = Count:Hits, .fns = ~ sum(., na.rm = TRUE)), .groups = "drop") |>
   bind_cols(
-    ebt_mds_full %>% summarise(across(.cols = Loc, .fns = ~ unlist(.) %>% n_distinct()), .groups = "drop"))
+    ebt_mds_full |> summarise(across(.cols = Loc, .fns = ~ unlist(.) |> n_distinct()), .groups = "drop"))
 ```
 
 Active contribution to EBT was recorded on **`r days$total %>% format(big.mark = ",")` days** between `r min(ebt_mds_full$Date)` and `r max(ebt_mds_full$Date)`. Bills were entered on `r days$bills %>% format(big.mark = ",")` days (= `r (days$bills / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %) and hits occurred on `r days$hits %>% format(big.mark = ",")` days (= `r (days$hits / days$total * 100) %>% sprintf(., fmt = '%#.2f')` %).\
@@ -71,32 +73,33 @@ Active periods are consecutive days with at least one bill entered. The three lo
 
 ```{r periods, echo=FALSE}
 
-ebt_mds_full %>% 
-  add_column(Type = (pull(., Count) > 0) %>%
-               rle() %>%
-               `[[`(1) %>%
-               rep(1:length(.), .)) %>%
-  group_by(Type) %>% 
-  summarise(From = min(Date),
-            To = max(Date),
+ebt_mds_full |>
+  (\(x) add_column(x, Type = rle(pull(x, Count) > 0)[[1]] |>
+                     (\(y) rep(1:length(y), y))()))() |>
+  group_by(Type) |> 
+  summarise(Begin = min(Date),
+            End = max(Date),
             Days = n(),
             Bills = sum(Count),
             Value = sum(Value),
             Hits = sum(Hits),
-            BpD = (Bills / Days) %>% round(1),
-            Avg = (Value / Bills) %>% round(2),
-            HitRt = (Bills / Hits) %>% round(2),
-            .groups = "drop") %>% 
+            BpD = (Bills / Days) |> round(1),
+            Avg = (Value / Bills) |> round(2),
+            HitRt = (Bills / Hits) |> round(2),
+            .groups = "drop") |> 
   mutate(Type = case_when(Bills == 0 ~ "inactive",
-                          TRUE ~ "active")) %>% 
-  arrange(desc(Days)) %>%
-  filter(Type == "active") %>% 
-  select(-Type) %>% 
+                          TRUE ~ "active")) |> 
+  arrange(desc(Days)) |>
+  filter(Type == "active") |> 
+  select(-Type) |> 
   head(3) -> tmp
-  # knitr::kable(tmp, format.args = list(big.mark = ','))
-  flextable(tmp)
-
+# knitr::kable(tmp, format.args = list(big.mark = ','))
+flextable(data = tmp) |>
+  vline(j = "End", part = "all") |> 
+  align(align = "left", part = "header", j = 1:2)
 ```
+
+ \
 
 The **three longest periods** cover **`r sum(tmp$Days) %>% format(big.mark = ",")` days** (= `r (sum(tmp$Days) / days$total * 100) %>% sprintf(., fmt = '%#.2f')`%), **`r sum(tmp$Bills) %>% format(big.mark = ",")` bills** (= `r (sum(tmp$Bills) / stat$Count * 100) %>% sprintf(., fmt = '%#.2f')`%), a total value of **`r sum(tmp$Value) %>% format(big.mark = ",")` Euro** (= `r (sum(tmp$Value) / stat$Value * 100) %>% sprintf(., fmt = '%#.2f')`%) and **`r sum(tmp$Hits) %>% format(big.mark = ",")` hits** (= `r (sum(tmp$Hits) / stat$Hits * 100) %>% sprintf(., fmt = '%#.2f')`%).
 
@@ -142,31 +145,36 @@ The seven month with most entered bills were:
 
 ```{r months, echo=FALSE}
 
-ebt_mds_full %>%
+ebt_mds_full |>
   # Zusammenfassen der Daten pro Monat
-  group_by(Month = floor_date(Date, unit = "month") %>% str_sub(1, 7)) %>% 
+  group_by(Month = floor_date(Date, unit = "month") |> str_sub(1, 7)) |> 
   summarise(Days = n(),
             Bills = sum(Count, na.rm = TRUE),
             Value = sum(Value, na.rm = TRUE),
             Hits = sum(Hits, na.rm = TRUE),
-            BpD = (Bills / Days) %>% round(1),
-            Avg = (Value / Bills) %>% round(2),
-            HitRt = (Bills / Hits) %>% round(2),
-            .groups = "drop") %>% 
+            BpD = (Bills / Days) |> round(1),
+            Avg = (Value / Bills) |> round(2),
+            HitRt = (Bills / Hits) |> round(2),
+            .groups = "drop") |> 
   arrange(desc(Bills)) -> tmp
-  # knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
-  flextable(head(tmp, 7))
-  
+# knitr::kable(head(tmp, 5), format.args = list(big.mark = ','))
+flextable(data = head(tmp, 7)) |>
+  vline(j = "Month", part = "all")
+
 ```
+
+ \
 
 The seven months with least entered bills were:
 
 ```{r months2, echo=FALSE}
 
 # knitr::kable(tail(tmp, 5), format.args = list(big.mark = ','))
-  flextable(tail(tmp, 7))
-
+flextable(data = tail(tmp, 7)) |>
+  vline(j = "Month", part = "all")
 ```
+
+ \
 
 \pagebreak
 
@@ -234,10 +242,12 @@ ebt_deno %>% select(-Date) %>%
          C_Pct = (Count / sum(Count) * 100) %>% round(., 2),
          V_Pct = (Value / sum(Value) * 100) %>% round(., 2)) %>% 
   select(Denom, Count, C_Pct, Value, V_Pct) -> tmp
-  # knitr::kable(tmp, format.args = list(big.mark = ','))
-  flextable(tmp)
-
+# knitr::kable(tmp, format.args = list(big.mark = ','))
+flextable(tmp) |>
+  vline(j = "Denom", part = "all")
 ```
+
+ \
 
 Distribution of denominations by year:
 
@@ -276,8 +286,8 @@ ebt_mds_full %>%
                `[[`(1) %>%
                rep(1:length(.), .)) %>%
   group_by(Type) %>% 
-  summarise(From = min(Date),
-            To = max(Date),
+  summarise(Begin = min(Date),
+            End = max(Date),
             Days = n(),
             Bills = sum(Count),
             Value = sum(Value),
@@ -299,30 +309,33 @@ ebt_mds_full %>%
   symb <- c(letters, "\u002A", "\u2020", "\u2021") # last three are asterisk, dagger, double dagger
   
   # for later plots
-  dat <- streaks %>% arrange(From) %>% tail(15)
+  dat <- streaks %>% arrange(Begin) %>% tail(15)
   dat0 <- semi_join(tmp, dat) %>%
-    mutate(Mid = as_date(From  + as.duration(interval(From, To)) / 2)) %>% 
+    mutate(Mid = as_date(Begin  + as.duration(interval(Begin, End)) / 2)) %>% 
     rowid_to_column(var = "#") %>% 
     mutate(`#` = symb[`#`])
   
-  tmp <- left_join(tmp, dat0 %>% select(`#`, From, To)) %>%
+  tmp <- left_join(tmp, dat0 %>% select(`#`, Begin, End)) %>%
     # replace_na(list(`#`= "&#0000;")) %>% # Null symbol (HTML)
     replace_na(list(`#`= " ")) %>% 
     relocate(`#`)
   
-  # knitr::kable(tmp, format.args = list(big.mark = ','))
-  flextable(tmp)
-
+# knitr::kable(tmp, format.args = list(big.mark = ','))
+flextable(tmp) |>
+  vline(j = "End", part = "all") |> 
+  align(align = "left", part = "header", j = 1:2)
 ```
+
+ \
 
 Plot of the 15 most recent hit streaks:
 
 ```{r hits2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7.5, fig.asp=9/16}
 
 p <- ggplot() +
-  geom_rect(data = dat, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
-  geom_rect(data = dat0, mapping = aes(xmin = From - .5, xmax = To + .5, ymin = 0, ymax = Hits/Days), fill = NA, color = "grey25") +
-  geom_text(data = dat0, mapping = aes(x = To - days(2), y = Hits/Days + .15, label = `#`)) +
+  geom_rect(data = dat, mapping = aes(xmin = Begin - .5, xmax = End + .5, ymin = 0, ymax = Hits/Days, fill = HitRt)) +
+  geom_rect(data = dat0, mapping = aes(xmin = Begin - .5, xmax = End + .5, ymin = 0, ymax = Hits/Days), fill = NA, color = "grey25") +
+  geom_text(data = dat0, mapping = aes(x = End - days(2), y = Hits/Days + .15, label = `#`)) +
   scale_x_date(name = "Time", date_labels = "%m/%Y", expand = c(.01, .01)) +
   scale_y_continuous(name = "Hits per Day", expand = c(.02, .02)) +
   scale_fill_viridis_c(name = "Hit Ratio", direction = -1, begin = .05, end = .95) +
