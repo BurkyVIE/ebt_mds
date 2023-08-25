@@ -4,21 +4,6 @@ ebt_mds_grpd(per = "year", grp_nm = "Date") |>
 
 # - - - - -
 
-ebt_mds_grpd(per = "year", grp_nm = "Date") |> 
-  select(Label, Deno) |> 
-  transmute(Year = Label, map_dfr(Deno, ~set_names(., c(5, 10, 20, 50, 100, 200, 500)))) |> 
-  gt::gt(rowname_col = "Year") |>
-  gt::tab_spanner(label = "Denomination", columns = "5":"500") |>
-  gt::tab_stubhead(label = "Year") |> 
-  gt::fmt_number("5":"500", decimals = 0) |>
-  gt::data_color("5":"500", palette = "viridis", reverse = FALSE) |> 
-  gt::tab_header(title = "Number of Bills Entered", subtitle = "at EuroBillTracker by Burky") |> 
-  gt::tab_source_note(source_note = "Visit: https://www.eurobiltracker.com") |> 
-  gt::tab_footnote(footnote = "subject to change", locations = gt::cells_stub(Year == max(Year))) |> 
-  gtExtras::gt_theme_538()
-
-# - - - - -
-
 ebt_mds_grpd(per = "year") |> 
   select(Label, Deno) |> 
   transmute(Label, map_dfr(Deno, ~ set_names(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .))))) |> 
@@ -54,6 +39,21 @@ ebt_mds_grpd(per = "year")|>
 
 # - - - - -
 
+ebt_mds_grpd(per = "year", grp_nm = "Date") |> 
+  select(Label, Deno) |> 
+  transmute(Year = Label, map_dfr(Deno, ~set_names(., c(5, 10, 20, 50, 100, 200, 500)))) |> 
+  gt::gt(rowname_col = "Year") |>
+  gt::tab_spanner(label = "Denomination", columns = "5":"500") |>
+  gt::tab_stubhead(label = "Year") |> 
+  gt::fmt_number("5":"500", decimals = 0) |>
+  gt::data_color("5":"500", palette = "viridis", reverse = FALSE) |> 
+  gt::tab_header(title = "Number of Bills Entered", subtitle = "at EuroBillTracker by Burky") |> 
+  gt::tab_source_note(source_note = "Visit: https://www.eurobiltracker.com") |> 
+  gt::tab_footnote(footnote = "given values are subject to change", placement = "right", locations = gt::cells_stub(Year == max(Year))) |> 
+  gtExtras::gt_theme_538()
+
+# - - - - -
+
 map_df(2004:format(Sys.Date(), "%Y"), ~ebd(.)) |>
   rename(Year = Selection, EqualBillsDay = EBDay) |>
   gt::gt() |>
@@ -63,7 +63,10 @@ map_df(2004:format(Sys.Date(), "%Y"), ~ebd(.)) |>
   gt::data_color(columns = Days, target_columns = EqualBillsDay:StdYears, palette = "viridis", reverse = TRUE, domain = c(1, 700)) |> 
   gt::tab_header(title = "Equal Bills Day", subtitle = "at EuroBillTracker by Burky") |> 
   gt::tab_source_note(source_note = "Visit: https://www.eurobiltracker.com") |> 
-  gtExtras::gt_theme_538()
+  gt::tab_footnote(footnote = "no Equal Bills Day yet", placement = "right", locations = gt::cells_body(1, is.na(EqualBillsDay))) |> 
+  gt::tab_footnote(footnote = "subject to change", placement = "right", locations = gt::cells_body(2, Year == max(Year))) |> 
+  gt::tab_options(footnotes.multiline = FALSE, footnotes.sep = "; ") |> 
+  gtExtras::gt_theme_538() #|> gt::gtsave("ebd.html")
 
 # - - - - -
 
