@@ -19,7 +19,7 @@ list(
                             Value = .x  * .y)))() |>                                         # Value
     mutate(across(c(C = Count, V = Value), ~. / sum(.) * 100, .names = "{.col}_Pct"),        # erzeuge Pct (neue Namen wegen Benamsung Ergebnis)
            across(c(C = C_Pct, V = V_Pct),                                                   # erzeuge Graphen  (neue Namen wegen Benamsung Ergebnis)
-                  ~map_chr(., ~paste(rep("#", ceiling(. / 1.5)), collapse = "")),            # !!! hier wird definiert wievile Prozentpunkte ein Zeichen ergeben
+                  ~map_chr(., ~paste(rep("=", ceiling(. / 1.5)), collapse = "")),            # !!! hier wird definiert wievile Prozentpunkte ein Zeichen ergeben
                   .names = "{.col}_Graph")) |>                                               #                                                |
     mutate(across(c("Count", "Value"), ~format(., big.mark = ",")),                          # formatieren Tausender (Trennung)               |
            across(ends_with("Pct"), ~round(., 2)),                                           # runde Pct auf zwei Nachkommastellen            v
