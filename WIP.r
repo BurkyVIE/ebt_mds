@@ -39,7 +39,7 @@ ebt_mds_grpd(per = "year")|>
 
 # - - - - -
 
-ebt_mds_grpd(per = "year", grp_nm = "Date") |> 
+  ebt_mds_grpd(per = "year", grp_nm = "Date") |> 
   select(Label, Deno) |> 
   transmute(Year = Label, map_dfr(Deno, ~set_names(., c(5, 10, 20, 50, 100, 200, 500)))) |> 
   gt::gt(rowname_col = "Year") |>
@@ -49,8 +49,8 @@ ebt_mds_grpd(per = "year", grp_nm = "Date") |>
   gt::data_color("5":"500", palette = "viridis", reverse = FALSE) |> 
   gt::tab_header(title = "Number of Bills Entered", subtitle = "at EuroBillTracker by Burky") |> 
   gt::tab_source_note(source_note = "Visit: https://www.eurobiltracker.com") |> 
-  gt::tab_footnote(footnote = "given values are subject to change", placement = "right", locations = gt::cells_stub(Year == max(Year))) |> 
-  gtExtras::gt_theme_538()
+  gt::tab_footnote(footnote = "values are subject to change", placement = "right", locations = gt::cells_stub(Year == max(Year))) |> 
+  gtExtras::gt_theme_538() #|> gt::gtsave("test.html")
 
 # - - - - -
 
@@ -66,7 +66,7 @@ map_df(2004:format(Sys.Date(), "%Y"), ~ebd(.)) |>
   gt::tab_footnote(footnote = "no Equal Bills Day yet", placement = "right", locations = gt::cells_body(1, is.na(EqualBillsDay))) |> 
   gt::tab_footnote(footnote = "subject to change", placement = "right", locations = gt::cells_body(2, Year == max(Year))) |> 
   gt::tab_options(footnotes.multiline = FALSE, footnotes.sep = "; ") |> 
-  gtExtras::gt_theme_538() #|> gt::gtsave("ebd.html")
+  gtExtras::gt_theme_538() #|> gt::gtsave("test.html")
 
 # - - - - -
 
@@ -88,8 +88,7 @@ ebt_mds_full |>
                  Value = as.integer(sum(.x)),
                  nLoc = length(.y),
                  Avg = mean(.x),
-                 Med = median(.x),
-                 SD = sd(.x))),
+                 Med = median(.x))),
     HitRt = Count / Hits, # Ableitungen
     EntRt = Count / Days,
     LocRt = nLoc / Days) |> 
@@ -98,11 +97,18 @@ ebt_mds_full |>
   filter(Days >= 14) |> 
   gt::gt() |>
   gt::fmt_integer(c(Days, Hits, Count, Value, nLoc, Med), sep_mark = ",") |> 
-  gt::fmt_number(c(Avg, SD, HitRt, EntRt, LocRt), decimals = 2) |>
-  gt::data_color(Avg:SD, palette = "YlGn", reverse = F) |> 
+  gt::fmt_number(c(Avg, HitRt, EntRt, LocRt), decimals = 2) |>
+  gt::data_color(Avg:Med, palette = "YlGn", reverse = F) |> 
   gt::data_color(HitRt:LocRt, palette = "YlOrRd", reverse = F) |> 
   gt::data_color(EntRt:LocRt, palette = "YlOrRd", reverse = T) |> 
   gt::tab_header(title = "Hit Streaks (= 14 Days)", subtitle = "at EuroBillTracker by Burky") |> 
   gt::tab_source_note(source_note = "Visit: https://www.eurobiltracker.com") |> 
-  gtExtras::gt_theme_538()
+  gt::tab_footnote(footnote = "distinct entry locations", placement = "right", locations = gt::cells_column_labels("nLoc")) |> 
+  gt::tab_footnote(footnote = "value/count", placement = "right", locations = gt::cells_column_labels("Avg")) |> 
+  gt::tab_footnote(footnote = "median(denomination)", placement = "right", locations = gt::cells_column_labels("Med")) |> 
+  gt::tab_footnote(footnote = "count/hits", placement = "right", locations = gt::cells_column_labels("HitRt")) |> 
+  gt::tab_footnote(footnote = "count/days", placement = "right", locations = gt::cells_column_labels("EntRt")) |> 
+  gt::tab_footnote(footnote = "nloc/days", placement = "right", locations = gt::cells_column_labels("LocRt")) |> 
+  gt::tab_options(footnotes.multiline = FALSE, footnotes.sep = "; ") |> 
+  gtExtras::gt_theme_538() #|> gt::gtsave("test.html")
 
