@@ -21,7 +21,7 @@ list(
            across(c(C = C_Pct, V = V_Pct),                                                   # erzeuge Graphen  (neue Namen wegen Benamsung Ergebnis)
                   ~map_chr(., ~paste(rep("#", ceiling(. / 1.5)), collapse = "")),            # !!! hier wird definiert wievile Prozentpunkte ein Zeichen ergeben
                   .names = "{.col}_Graph")) |>                                               #                                                |
-    mutate(across(c("Count", "Value"), ~format(., big.mark = ",")),                          # formatieren Trennung (Tausender)               |
+    mutate(across(c("Count", "Value"), ~format(., big.mark = ",")),                          # formatieren Tausender (Trennung)               |
            across(ends_with("Pct"), ~round(., 2)),                                           # runde Pct auf zwei Nachkommastellen            v
            across(ends_with("Graph"), ~str_pad(., width = 40 / 1.5, side = "right"))) |>     # formatieren Graph auf fixe Breite    (max_% / ...)
     relocate(starts_with("V"), .after = C_Graph) |>                                          # umsortieren der Reihenfolge der Variablen
