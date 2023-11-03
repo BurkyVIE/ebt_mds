@@ -48,28 +48,28 @@ visited <- st_join(grid, locs, join = st_covers) |>
   unique()
 
 # Plot ----
-mydotmap<-leaflet() |> 
+mydotmap <- leaflet() |> 
   addTiles(group = "OSM (default)") |> 
-  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
+  # addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") |> 
   setView(lng = 16.36449, lat = 48.210033, zoom = 7) |> 
   addPolylines(data = glines,
               weight = 2,
               color = "red",
               fill = FALSE,
-              group = "Dots - Europe") |> 
+              group = "Dots - Europe") |>
   addPolygons(data = visited,
               weight = 0,
               color = "navy",
-              group = "Visited Dots") |> 
+              group = "Visited Dots") |>
   addCircleMarkers(data = locs,
                    label = locs$Label, 
                    weight = 2,
-                   radius = 17,
+                   radius = 21,
                    color = "navy",
                    group = "Locations",
                    clusterOptions = markerClusterOptions(),
                    labelOptions = labelOptions(textsize = "12px")) |> 
-  addLayersControl(baseGroups = c("OSM (default)", "Toner Lite"),
+  addLayersControl(#baseGroups = c("OSM (default)", "Toner Lite"),
                    overlayGroups = c("Dots - Europe", "Visited Dots", "Locations"),
                    options = layersControlOptions(collapsed = FALSE)) |> 
   hideGroup("Locations")
