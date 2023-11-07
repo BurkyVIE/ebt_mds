@@ -93,7 +93,7 @@ ebt_mds_full |>
     EntRt = Count / Days,
     LocRt = nLoc / Days) |> 
   select(-(Streak:Loc)) |> 
-  arrange(desc(Days)) |>
+  arrange(desc(Days), HitRt) |>
   filter(Days >= 14) |> 
   gt::gt() |>
   gt::fmt_integer(c(Days, Hits, Count, Value, nLoc, Med), sep_mark = ",") |> 
