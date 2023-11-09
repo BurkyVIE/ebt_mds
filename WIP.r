@@ -21,6 +21,23 @@ ebt_mds_grpd(per = "year") |>
 
 # - - - - -
 
+ebt_mds_grpd(per = "day", grp_nm = "Date") |> 
+  select(Date, Deno) |> 
+  transmute(Date, map_dfr(Deno, ~set_names(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .))))) |> 
+  mutate(across(starts_with("E"), ~cumsum(.))) |>
+  pivot_longer(-Date, names_to = "Deno", values_to = "Count") |> 
+  mutate(Deno = ordered(Deno) |> fct_rev()) |> 
+  ggplot() +
+  aes(x = Date, y = Count, group = Deno, fill = Deno) +
+  geom_col(color = NA, width = 1, position = "fill") +
+  scale_y_continuous(name = "Share [%]", labels = function(x) x * 100, expand = c(0, 0)) +
+  scale_fill_manual(values = c("E005" = "#9aa79c", "E010" = "#f9bcc1", "E020" = "#70a0b5",
+                               "E050" = "#f9bb7f", "E100" = "#8ec67d", "E200" = "#fae966",
+                               "E500" = "#c59fb4")) +
+  theme_ebt()
+
+# - - - - -
+
 ebt_mds_grpd(per = "year")|> 
   select(Label, Deno) |> 
   transmute(Label, map_dfr(Deno, ~ set_names(., paste0("E", c(5, 10, 20, 50, 100, 200, 500) %>% sprintf("%03d", .)))))|> 
@@ -109,6 +126,7 @@ ebt_mds_full |>
   gt::tab_footnote(footnote = "count/hits", placement = "right", locations = gt::cells_column_labels("HitRt")) |> 
   gt::tab_footnote(footnote = "count/days", placement = "right", locations = gt::cells_column_labels("EntRt")) |> 
   gt::tab_footnote(footnote = "nloc/days", placement = "right", locations = gt::cells_column_labels("LocRt")) |> 
+  gt::tab_footnote(footnote = "active streak", placement = "left", locations = gt::cells_body(1, To == today())) |> 
   gt::tab_options(footnotes.multiline = FALSE, footnotes.sep = "; ") |> 
   gtExtras::gt_theme_538() #|> gt::gtsave("test.html")
 
