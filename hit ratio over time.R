@@ -8,9 +8,11 @@ cuts <- list(
   right_closed = TRUE)
 
 # DATA ----
+
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   select(Date, Count, Hits, HitRt) |>
   mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
+         l500HR = (cCount - lag(cCount, 500)) / (cHits - lag(cHits, 500)),
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 3),
          Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
@@ -48,18 +50,18 @@ windows(16, 9, restoreConsole = TRUE)
 plot(p)
 
 # CLEAN UP ----
-rm(cuts, dat, n_extr, extreme, spec0, spec, p)
+rm(cuts, dat, spec0, spec, p)
 
 
 
 # Graph max and min
-# dat |>
-#   select(Date, cHitRt) |>
-#   mutate(cMin = cummin(cHitRt),
-#          cMax = rev(cummax(rev(cHitRt)))) |>
-#   ggplot() +
-#   aes(x = Date) +
-#   geom_line(aes(y = cHitRt), linewidth = 2, col = "gold") +
-#   geom_line(aes(y = cMin), color = "forestgreen") +
-#   geom_line(aes(y = cMax), color = "firebrick") +
-#   scale_y_log10()
+dat |>
+  select(Date, cHitRt) |>
+  mutate(cMin = cummin(cHitRt),
+         cMax = rev(cummax(rev(cHitRt)))) |>
+  ggplot() +
+  aes(x = Date) +
+  geom_line(aes(y = cHitRt), linewidth = 2, col = "gold") +
+  geom_line(aes(y = cMin), color = "forestgreen") +
+  geom_line(aes(y = cMax), color = "firebrick") +
+  scale_y_log10()
