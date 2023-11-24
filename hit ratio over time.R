@@ -7,16 +7,20 @@ cuts <- list(
   c("≤ 80", "≤ 100", "≤ 125", "≤ 500", "≤ 1,000", "> 1,000"),
   right_closed = TRUE)
 
-# DATA ----
+lag <- 350
 
+# DATA ----
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
   select(Date, Count, Hits, HitRt) |>
   mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
-         l500HR = (cCount - lag(cCount, 500)) / (cHits - lag(cHits, 500)),
+         !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)),
          cHitRt = cCount / cHits,
          cHitRtLong = num(cHitRt, digits = 3),
          Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
          Change_lit = c("lower", "equal", "higher")[Change + 2])
+
+rm(lag)
+
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
 spec0 <- filter(dat, is.finite(cHitRt))
@@ -31,8 +35,9 @@ spec <- bind_rows(
   
 # PLOT ----
 p <- ggplot(data = dat) +
-  aes(x = Date, y = cHitRt, fill = Set) +
-  geom_col(width = 1) +
+  aes(x = Date, y = cHitRt) +
+  geom_col(aes(fill = Set), width = 1) +
+  # geom_line(aes(y = l350HR), col = "navy", linewidth = 1.5, alpha = .33) +
   geom_point(data = spec, shape = 1, size = 5, show.legend = FALSE) +
   ggrepel::geom_label_repel(data = spec, mapping = aes(label = Label),
                             box.padding = 1.5, nudge_y = -0.25, direction = "x",
@@ -43,7 +48,8 @@ p <- ggplot(data = dat) +
   labs(title = "EuroBillTracker - Hit Ratio over Time",
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)")) +
-  guides(fill = guide_legend(nrow = 1)) +
+  guides(fill = guide_legend(nrow = 1),
+         col = guide_legend(nrow = 1)) +
   theme_ebt()
 
 windows(16, 9, restoreConsole = TRUE)
