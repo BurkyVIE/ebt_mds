@@ -7,7 +7,7 @@ cuts <- list(
   c("≤ 80", "≤ 100", "≤ 125", "≤ 500", "≤ 1,000", "> 1,000"),
   right_closed = TRUE)
 
-lag <- 350
+lag <- 700
 
 # DATA ----
 dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
@@ -32,12 +32,12 @@ spec <- bind_rows(
   filter(spec0, row_number() == n())) |>
   mutate(Label = format(cHitRt, trim = TRUE, digits = 2, nsmall = 2, big.mark = ","),
          Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
-  
+
 # PLOT ----
 p <- ggplot(data = dat) +
   aes(x = Date, y = cHitRt) +
   geom_col(aes(fill = Set), width = 1) +
-  # geom_line(aes(y = l350HR), col = "navy", linewidth = 1.5, alpha = .33) +
+  # geom_line(aes(y = l700R), col = "black", linewidth = 1.5, alpha = .5) +
   geom_point(data = spec, shape = 1, size = 5, show.legend = FALSE) +
   ggrepel::geom_label_repel(data = spec, mapping = aes(label = Label),
                             box.padding = 1.5, nudge_y = -0.25, direction = "x",
@@ -61,13 +61,13 @@ rm(cuts, dat, spec0, spec, p)
 
 
 # Graph max and min
-dat |>
-  select(Date, cHitRt) |>
-  mutate(cMin = cummin(cHitRt),
-         cMax = rev(cummax(rev(cHitRt)))) |>
-  ggplot() +
-  aes(x = Date) +
-  geom_line(aes(y = cHitRt), linewidth = 2, col = "gold") +
-  geom_line(aes(y = cMin), color = "forestgreen") +
-  geom_line(aes(y = cMax), color = "firebrick") +
-  scale_y_log10()
+# dat |>
+#   select(Date, cHitRt) |>
+#   mutate(cMin = cummin(cHitRt),
+#          cMax = rev(cummax(rev(cHitRt)))) |>
+#   ggplot() +
+#   aes(x = Date) +
+#   geom_line(aes(y = cHitRt), linewidth = 2, col = "gold") +
+#   geom_line(aes(y = cMin), color = "forestgreen") +
+#   geom_line(aes(y = cMax), color = "firebrick") +
+#   scale_y_log10()
