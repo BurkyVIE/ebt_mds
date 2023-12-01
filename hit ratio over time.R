@@ -2,38 +2,38 @@
 library(tidyverse)
 
 # GLOBAL ----
-cuts <- list(
+cuts <- list( # Definition der Gruppen für die farblich unterschiedenen Hit Ratio Gruppen
   c(0, 80, 100, 125, 500, 1000, Inf),
   c("≤ 80", "≤ 100", "≤ 125", "≤ 500", "≤ 1,000", "> 1,000"),
   right_closed = TRUE)
 
 # DATA ----
-dat <-
-  (\(lag = 365*2)
+dat <- # Grundsätzliche Erstellung des idF verwendeten Datensatzes 
+  (\(lag = 365*2) # last x Days Hit Ratio wird hier - mittels anonymer Funktion - eingeführt
    ebt_mds_grpd(period = "day", grp_nm = "Date") |>
      select(Date, Count, Hits, HitRt) |>
-     mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
-            !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)),
+     mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"), # Kumulieren von Count und Hits
+            !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)), # last x Days Hit Ratio
             cHitRt = cCount / cHits,
             cHitRtLong = num(cHitRt, digits = 3),
             Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
-            Change_lit = c("lower", "equal", "higher")[Change + 2]))()
+            Change_lit = c("lower", "equal", "higher")[Change + 2]))() # Verbale BEschreibung der Veränderung
 
-dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
+dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]])) # Ergänzung der Gruppen im Datensatz
 
-spec0 <- filter(dat, is.finite(cHitRt))
+spec0 <- filter(dat, is.finite(cHitRt)) # Auswahl der Daten für die Beschriftungen
 
 spec <- bind_rows(
-  filter(spec0, row_number() == 1),
-  filter(spec0, cHitRt == min(cHitRt)),
-  filter(spec0, cHitRt == max(cHitRt)),
-  filter(spec0, row_number() == n())) |>
+  filter(spec0, row_number() == 1),      # first,
+  filter(spec0, cHitRt == min(cHitRt)),  # lowest,
+  filter(spec0, cHitRt == max(cHitRt)),  # highest und
+  filter(spec0, row_number() == n())) |> # latest Hit Ratio
   mutate(Label = format(cHitRt, trim = TRUE, digits = 2, nsmall = 2, big.mark = ","),
          Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
   
 # PLOT ----
-he <- names(dat)[str_detect(names(dat), "l\\d+HR")]
-he <- list(sym(he), as.numeric(str_extract(he, "\\d+")))
+he <- names(dat)[str_detect(names(dat), "l\\d+HR")] # Auslesen des Variablennamen für last x Days Hit Ratio
+he <- list(sym(he), as.numeric(str_extract(he, "\\d+"))) # Auslesen des Zeitfensters
 
 p <- ggplot(data = dat) +
   aes(x = Date, y = cHitRt) +
