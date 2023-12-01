@@ -7,19 +7,17 @@ cuts <- list(
   c("≤ 80", "≤ 100", "≤ 125", "≤ 500", "≤ 1,000", "> 1,000"),
   right_closed = TRUE)
 
-lag <- 700
-
 # DATA ----
-dat <- ebt_mds_grpd(period = "day", grp_nm = "Date") |>
-  select(Date, Count, Hits, HitRt) |>
-  mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
-         !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)),
-         cHitRt = cCount / cHits,
-         cHitRtLong = num(cHitRt, digits = 3),
-         Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
-         Change_lit = c("lower", "equal", "higher")[Change + 2])
-
-rm(lag)
+dat <-
+  (\(lag = 700)
+   ebt_mds_grpd(period = "day", grp_nm = "Date") |>
+     select(Date, Count, Hits, HitRt) |>
+     mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
+            !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)),
+            cHitRt = cCount / cHits,
+            cHitRtLong = num(cHitRt, digits = 3),
+            Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
+            Change_lit = c("lower", "equal", "higher")[Change + 2]))()
 
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]]))
 
@@ -32,13 +30,13 @@ spec <- bind_rows(
   filter(spec0, row_number() == n())) |>
   mutate(Label = format(cHitRt, trim = TRUE, digits = 2, nsmall = 2, big.mark = ","),
          Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
-
+  
 # PLOT ----
 p <- ggplot(data = dat) +
   aes(x = Date, y = cHitRt) +
   geom_col(aes(fill = Set), width = 1) +
-  # geom_line(aes(y = l700R), col = "black", linewidth = 1.5, alpha = .5) +
-  geom_point(data = spec, shape = 1, size = 5, show.legend = FALSE) +
+  # geom_line(aes(y = l700HR), color = "black", linewidth = 1.5, alpha = .5) +
+  geom_point(data = spec, shape = 1, size = 5) +
   ggrepel::geom_label_repel(data = spec, mapping = aes(label = Label),
                             box.padding = 1.5, nudge_y = -0.25, direction = "x",
                             size = 2.75, fill = rgb(221, 226, 233, maxColorValue = 255), alpha = 3/4, show.legend = FALSE) +
