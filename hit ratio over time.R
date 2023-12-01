@@ -9,7 +9,7 @@ cuts <- list(
 
 # DATA ----
 dat <-
-  (\(lag = 700)
+  (\(lag = 365*2)
    ebt_mds_grpd(period = "day", grp_nm = "Date") |>
      select(Date, Count, Hits, HitRt) |>
      mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"),
@@ -32,10 +32,13 @@ spec <- bind_rows(
          Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
   
 # PLOT ----
+he <- names(dat)[str_detect(names(dat), "l\\d+HR")]
+he <- list(sym(he), as.numeric(str_extract(he, "\\d+")))
+
 p <- ggplot(data = dat) +
   aes(x = Date, y = cHitRt) +
   geom_col(aes(fill = Set), width = 1) +
-  # geom_line(aes(y = l700HR), color = "black", linewidth = 1.5, alpha = .5) +
+  geom_line(aes(y = !!(he[[1]]), lty = "l..HR"), linejoin = "bevel", color = "black", linewidth = 1.5, alpha = .6) +
   geom_point(data = spec, shape = 1, size = 5) +
   ggrepel::geom_label_repel(data = spec, mapping = aes(label = Label),
                             box.padding = 1.5, nudge_y = -0.25, direction = "x",
@@ -43,6 +46,7 @@ p <- ggplot(data = dat) +
   scale_x_date(name = "Time", date_minor_breaks = "year", expand = expansion(add = c(30, 90))) +
   scale_y_log10(name = "Cumulative Hit Ratio [log10]", labels = function(x)format(x, big.mark = ","), expand = expansion(mult = .01)) +
   scale_fill_brewer(name = "Hit Ratio", palette = "RdYlGn", direction = -1, na.value = "grey50") +
+  scale_linetype_manual(name = "Moving Average", values = 1, labels = paste("Last", format(he[[2]], big.mark = ","), "Days Hit Ratio")) +
   labs(title = "EuroBillTracker - Hit Ratio over Time",
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)")) +
@@ -54,7 +58,7 @@ windows(16, 9, restoreConsole = TRUE)
 plot(p)
 
 # CLEAN UP ----
-rm(cuts, dat, spec0, spec, p)
+rm(cuts, dat, spec0, spec, he, p)
 
 
 
