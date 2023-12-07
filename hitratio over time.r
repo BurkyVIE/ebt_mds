@@ -9,15 +9,16 @@ cuts <- list( # Definition der Gruppen für die farblich unterschiedenen Hit Rat
 
 # DATA ----
 dat <- # Grundsätzliche Erstellung des idF verwendeten Datensatzes 
-  (\(lag = 365*2) # last x Days Hit Ratio wird hier - mittels anonymer Funktion - eingeführt
+  (\(lag = 365, digi_lon = 3) { # last x Days Hit Ratio wird hier - mittels anonymer Funktion - eingeführt, ebenso Anzahl Nachkommastellen für Long-Repräsentation
+   vnm = sym(paste0("l", lag, "HR")) # Erstellen des Variablennamens für last x Days
    ebt_mds_grpd(period = "day", grp_nm = "Date") |>
      select(Date, Count, Hits, HitRt) |>
-     mutate(across(c(Count, Hits), cumsum, .names = "c{.col}"), # Kumulieren von Count und Hits
-            !!sym(paste0("l", lag, "HR")) := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)), # last x Days Hit Ratio
+     mutate(across(c(Count, Hits), ~cumsum(.), .names = "c{.col}"), # Kumulieren von Count und Hits
+            !!vnm := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)), # last x Days Hit Ratio
             cHitRt = cCount / cHits,
-            cHitRtLong = num(cHitRt, digits = 3),
-            Change = c(NaN, sign(diff(round(cHitRt, 3)))),  # Differenz auf 'round' Nachkommastellen
-            Change_lit = c("lower", "equal", "higher")[Change + 2]))() # Verbale BEschreibung der Veränderung
+            across(c(!!vnm, cHitRt), ~num(., digits = digi_lon), .names = "{.col}Long"), # Langversionenen der Hit Ratios (Nachkommastellen hier regelbar)
+            DcHitRt = c(NaN, sign(diff(round(cHitRt, digi_lon)))),  # Differenz auf 'digi_lon' Nachkommastellen (siehe Definition der anonymen Funktion)
+            dcHitRt_lit = c("lower", "equal", "higher")[DcHitRt + 2])})() # Verbale Beschreibung der Veränderung
 
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]])) # Ergänzung der Gruppen im Datensatz
 
@@ -32,7 +33,7 @@ spec <- bind_rows(
          Label = paste(c("first", "lowest", "highest", "latest"), Label, sep = ": "))
   
 # PLOT ----
-he <- names(dat)[str_detect(names(dat), "l\\d+HR")] # Auslesen des Variablennamen für last x Days Hit Ratio
+he <- names(dat)[str_detect(names(dat), "l\\d+HR$")] # Auslesen des Variablennamen für last x Days Hit Ratio
 he <- list(sym(he), as.numeric(str_extract(he, "\\d+"))) # Auslesen des Zeitfensters
 
 p <- ggplot(data = dat) +
