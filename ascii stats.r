@@ -1,8 +1,7 @@
-# denovec <- c(30, 53, 50, 0, 25, 0, 0)                                               # <- Input here
-## ebt_mds_grpd(per = "overall")[[2]] %>% paste()
-denovec <- c(293889, 251408, 193989, 137280, 66165, 10848, 5296)
+## ebt_mds_grpd(per = "overall")[[2]] |> paste() |> writeClipboard()
+denovec <- c(305545, 259972, 199685, 139104, 67493, 11599, 5296)
 
-list(
+list("Overview" =
   denovec |>                                                                                   # ZUSAMMENFASSUNG ---
     (\(x) c(x, numeric(7))[1:7])() |>                                                          # ergänze auf sieben Stellen
     (\(x, y = c(5, 10, 20, 50, 100, 200, 500)) x %*% cbind(rep(1, 7), y, y ** 2))() |>         # berechne n, sum(x) und sum(x²); Wertstufen im Funktionsaufruf
@@ -12,6 +11,7 @@ list(
     (\(x) paste0(x[1], " Euro in ", x[2], " Bills = ", x[3], " (avg) ± ", x[4], " (sd)"))() |> # füge in Rückgabe zusammen  
     noquote(), 
   
+  "Detail Denomination" =
   denovec |>                                                                                   # AUFSTELLUNG NACH DENOMINATION ---
     (\(x) c(x, numeric(7))[1:7])() |>                                                          # ergänze auf sieben Stellen
     (\(x, y = c(5, 10, 20, 50, 100, 200, 500))                                                 # basierend auf denovec und Scheinwerten ...
@@ -20,7 +20,7 @@ list(
                             Value = .x  * .y)))() |>                                           # Value
     mutate(across(c(C = Count, V = Value), ~. / sum(.) * 100, .names = "{.col}_Pct"),          # erzeuge Pct (neue Namen wegen Benamsung Ergebnis)
            across(c(C = C_Pct, V = V_Pct),                                                     # erzeuge Graphen  (neue Namen wegen Benamsung Ergebnis)
-                  ~map_chr(., ~paste(rep("=", ceiling(. / 1.5)), collapse = "")),              # !!! hier wird definiert wievile Prozentpunkte ein Zeichen ergeben
+                  ~map_chr(., ~paste(rep("=", ceiling(. / 1.5)), collapse = "")),              # !!! hier wird definiert wieviel Prozentpunkte ein Zeichen ergeben
                   .names = "{.col}_Graph")) |>                                                 #                                                |
     mutate(across(c("Count", "Value"), ~format(., big.mark = ",")),                            # formatieren Tausender (Trennung)               |
            across(ends_with("Pct"), ~round(., 2)),                                             # runde Pct auf zwei Nachkommastellen            v
