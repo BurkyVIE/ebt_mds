@@ -11,7 +11,7 @@ list("Overview" =
     (\(x) paste0(x[1], " Euro in ", x[2], " Bills = ", x[3], " (avg) ± ", x[4], " (sd)"))() |> # füge in Rückgabe zusammen  
     noquote(), 
   
-  "Detail Denomination" =
+  "Denomination" =
   denovec |>                                                                                   # AUFSTELLUNG NACH DENOMINATION ---
     (\(x) c(x, numeric(7))[1:7])() |>                                                          # ergänze auf sieben Stellen
     (\(x, y = c(5, 10, 20, 50, 100, 200, 500))                                                 # basierend auf denovec und Scheinwerten ...
