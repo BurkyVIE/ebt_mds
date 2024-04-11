@@ -63,18 +63,18 @@ mydotmap <- leaflet() |>
   setView(lng = 16.36449, lat = 48.210033, zoom = 7) |> 
   addPolylines(data = glines,
               weight = 2,
-              color = "tomato", #red
+              color = "#cc4778", #red tomatoe
               fill = FALSE,
               group = "Dots - Europe") |> 
   addPolygons(data = visited,
-              weight = 0,
-              color = "midnightblue", #navy
-              group = "Visited Dots") |>
+              weight = 1,
+              color = "#0d0887", #navy midnightblue
+              group = "Visited Dots") |> 
   addCircleMarkers(data = locs,
                    label = locs$Label, 
                    weight = 2,
-                   radius = 21,
-                   color = "firebrick", #navy
+                   radius = 17,
+                   color = "#f0f921", # navy firebrick
                    group = "Locations",
                    clusterOptions = markerClusterOptions(),
                    labelOptions = labelOptions(textsize = "12px")) |> 
