@@ -68,13 +68,13 @@ mydotmap <- leaflet() |>
               group = "Dots - Europe") |> 
   addPolygons(data = visited,
               weight = 0,
-              color = "darkcyan", #navy
+              color = "midnightblue", #navy
               group = "Visited Dots") |>
   addCircleMarkers(data = locs,
                    label = locs$Label, 
                    weight = 2,
                    radius = 21,
-                   color = "navy",
+                   color = "firebrick", #navy
                    group = "Locations",
                    clusterOptions = markerClusterOptions(),
                    labelOptions = labelOptions(textsize = "12px")) |> 
