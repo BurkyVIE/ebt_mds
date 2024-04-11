@@ -20,8 +20,17 @@ locs <- pseudo |>
 # - grid size: 157 x 150 (up from 150x150)
 
 # Grid ----
-raster <- list(long = seq(-12, 54, length = 158), 
+## Original Raster ----
+raster <- list(long = seq(-12, 54, length = 158),
                lat = seq(29, 71, length = 151))
+
+## Expanded Raster (Azores and Canaries) ----
+# deltas are the differences between grid lines
+deltas <- list(long = 66/157, # = (54 - -12) / 157
+               lat = 7/25) # = (71 - 29) / 150
+
+raster <- list(long = seq(-12 - 46 * deltas$long, 54, by = deltas$long),
+               lat = seq(29 - 5 * deltas$lat, 71, by = deltas$lat))
 
 glines <- as_tibble(
   rbind(cbind(x1 = -12, y1 = raster$lat, x2 = 54, y2 = raster$lat),
