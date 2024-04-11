@@ -46,7 +46,7 @@ grid <- crossing(lat = raster$lat |> head(-1),
                  long = raster$long |> head(-1)) |> 
   rowid_to_column(var = "ID") |> 
   mutate(dot = map2(.x = long, .y = lat,   # corners to all squares (must be closed)
-                    .f = ~ matrix(c(..1 + c(0, 1, 1, 0, 0) * 66/157, ..2 + c(0, 0, 1, 1, 0) * 42/150), ncol = 2) |>  list() |>  st_polygon())) |>  
+                    .f = ~ matrix(c(..1 + c(0, 1, 1, 0, 0) * deltas$long, ..2 + c(0, 0, 1, 1, 0) * deltas$lat), ncol = 2) |>  list() |>  st_polygon())) |>  
   st_as_sf(sf_column_name = "dot", crs = 4326) |>  
   st_set_agr("constant")
 
