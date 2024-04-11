@@ -33,8 +33,8 @@ raster <- list(long = seq(-12 - 46 * deltas$long, 54, by = deltas$long),
                lat = seq(29 - 5 * deltas$lat, 71, by = deltas$lat))
 
 glines <- as_tibble(
-  rbind(cbind(x1 = -12, y1 = raster$lat, x2 = 54, y2 = raster$lat),
-        cbind(x1 = raster$long, y1 = 29, x2 = raster$long, y2 = 71))
+  rbind(cbind(x1 = min(raster$long), y1 = raster$lat, x2 = max(raster$long), y2 = raster$lat),
+        cbind(x1 = raster$long, y1 = min(raster$lat), x2 = raster$long, y2 = max(raster$lat)))
   ) |> 
   mutate(line = pmap(.l = list(x1, y1, x2, y2),
                      .f = ~ st_linestring(rbind(c(..1, ..2), c(..3, ..4))))) |> 
