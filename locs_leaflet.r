@@ -86,4 +86,4 @@ mydotmap <- leaflet() |>
 htmlwidgets::saveWidget(mydotmap, file = "spec/mydotmap.html", selfcontained = FALSE, title = "MyDotMap - Burky")
 
 # Clean up ----
-rm(locs, raster, glines, grid, visited, mydotmap)
+rm(locs, raster, deltas, glines, grid, visited, mydotmap)
