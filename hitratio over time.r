@@ -19,7 +19,7 @@ dat <- # Grundsätzliche Erstellung des idF verwendeten Datensatzes
             smlr = rank(cHitRt, ties.method = "first") - 1, # Anzahl Tage mit niedrigerer cHitRt
             across(c(!!vnm, cHitRt), ~num(., digits = digi_lon), .names = "{.col}Long"), # Langversionenen der Hit Ratios (Nachkommastellen hier regelbar)
             DcHitRt = c(NaN, sign(diff(round(cHitRt, digi_lon)))),  # Differenz auf 'digi_lon' Nachkommastellen (siehe Definition der anonymen Funktion)
-            dcHitRt_lit = c("lower", "equal", "higher")[DcHitRt + 2])})() # Verbale Beschreibung der Veränderung
+            DcHitRt_lit = c("lower", "equal", "higher")[DcHitRt + 2])})() # Verbale Beschreibung der Veränderung
 
 dat <- mutate(dat, Set = cut(cHitRt, right = cuts[[3]], breaks = cuts[[1]], labels = cuts[[2]])) # Ergänzung der Gruppen im Datensatz
 
