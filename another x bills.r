@@ -37,11 +37,11 @@ he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
          D_Hts = Hits %/% x[3]) %>%
   mutate(across(.cols = starts_with("D_"), .fns = ~ . - lag(., 1))) %>%
   filter(D_Hts == 1 | D_Cnt == 1 | D_Val == 1) %>% 
-  add_row(Date = lubridate::ymd("2004-8-3"), D_Cnt = -1, D_Val = -1, D_Hts = -1, .before = 1)
+  add_row(Date = lubridate::ymd("2004-8-3"), D_Cnt = 1, D_Val = 1, D_Hts = 1, .before = 1)
 
-bind_rows(he %>% filter(D_Cnt < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
-          he %>% filter(D_Val < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
-          he %>% filter(D_Hts < 0) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
+bind_rows(he %>% filter(D_Cnt == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
+          he %>% filter(D_Val == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
+          he %>% filter(D_Hts == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
   mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1] / 1e3, "k Bills"), paste0(x[2] / 1e3, "k Euro"), paste0(x[3], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
