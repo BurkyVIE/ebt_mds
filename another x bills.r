@@ -1,46 +1,19 @@
-# library(tidyverse)
-# 
-# x <- 5e4  # another x bills
-# 
-# with(ebt_mds_grpd(per = "day", grp_nm = "Date"),
-#      rep(Date, Count)) %>% 
-#   `[`(0:(length(.) %/% (x - 1)) * x + 1) %>% 
-#   diff() %>% 
-#   as.numeric() %>% 
-#   as_tibble_col(., column_name = "Diff") %>% 
-#   ggplot(mapping = aes(x = Diff)) +
-#   geom_histogram(fill = "lightblue", color = "navy", binwidth = x/2e3*1.5, size = 1.25) +
-#   geom_boxplot(mapping = aes(y = .25), width = .2, color = "white", fill = "white", size = 2.5, alpha = .75) +
-#   geom_boxplot(mapping = aes(y = .25), width = .2, color = "purple3", fill = NA, size = 1.25) +
-#   labs(title = paste0("EuroBillTracker - Time to Enter Another ", format(x, big.mark = ","), " Bills"),
-#        subtitle = "by Burky",
-#        x = "Days",
-#        y = "Count") +
-#   theme_ebt() -> p
-# 
-# windows(16, 9)
-# plot(p)
-# rm(x, p)
-
-#---
-
 library(tidyverse)
 
 x <- c(Cnt = 1, Val = 20, Hts = 1/100) * 25e3
 
 he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
   select(Date, Cnt = Count, Val = Value, Hts = Hits) %>%
-  mutate(across(.cols = Cnt:Hts, .fns = ~ cumsum(.))) %>%
-  mutate(D_Cnt = Cnt %/% x["Cnt"],
-         D_Val = Val %/% x["Val"],
-         D_Hts = Hts %/% x["Hts"]) %>%
-  mutate(across(.cols = starts_with("D_"), .fns = ~ c(0, diff(.)))) %>%
-  filter(D_Hts == 1 | D_Cnt == 1 | D_Val == 1) %>% 
-  add_row(Date = lubridate::ymd("2004-8-3"), D_Cnt = 1, D_Val = 1, D_Hts = 1, .before = 1)
+  mutate(L_Cnt = cumsum(Cnt) %/% x["Cnt"],
+         L_Val = cumsum(Val) %/% x["Val"],
+         L_Hts = cumsum(Hts) %/% x["Hts"]) %>%
+  mutate(across(.cols = starts_with("L_"), .fns = ~ (c(0, diff(.))) == 1)) %>%
+  filter(L_Hts | L_Cnt | L_Val) %>% 
+  add_row(Date = lubridate::ymd("2004-8-3"), L_Cnt = TRUE, L_Val = TRUE, L_Hts = TRUE, .before = 1)
 
-bind_rows(he %>% filter(D_Cnt == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
-          he %>% filter(D_Val == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
-          he %>% filter(D_Hts == 1) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
+bind_rows(he %>% filter(L_Cnt) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
+          he %>% filter(L_Val) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
+          he %>% filter(L_Hts) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
   mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1] / 1e3, "k Bills"), paste0(x[2] / 1e3, "k Euro"), paste0(x[3], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
@@ -48,7 +21,7 @@ bind_rows(he %>% filter(D_Cnt == 1) %>% pull(Date) %>% as.numeric() %>% diff() %
   geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Set1") +
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
-  labs(title = paste0("EuroBillTracker - Time to get another ..."),
+  labs(title = paste0("EuroBillTracker - Time to get Another ..."),
        subtitle = "by Burky",
        caption = paste0("as: ",max(ebt_mds$Date) ," (https://www.eurobilltracker.com)"),
        x = "Days",
