@@ -18,8 +18,8 @@ bind_rows(he %>% filter(L_Cnt) %>% pull(Date) %>% as.numeric() %>% diff() %>% ti
                       labels = c(paste0(divisor["Cnt"] / 1e3, "k Bills"), paste0(divisor["Val"] / 1e3, "k Euro"), paste0(divisor["Hts"], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
-  geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2, alpha = .75) +
-  geom_boxplot(mapping = aes(y = 1), width = .75, fill = NA, size = 1.25) +
+  geom_boxplot(mapping = aes(y = 1.5), width = 1, color = "white", fill = "white", size = 2, alpha = .75) +
+  geom_boxplot(mapping = aes(y = 1.5), width = 1, fill = NA, size = 1.25) +
   scale_fill_brewer(palette = "Set1") +
   scale_x_continuous(breaks = function(lim) seq(0, lim[2], by = 360)) +
   labs(title = paste0("EuroBillTracker - Time to get Another ..."),
