@@ -14,7 +14,7 @@ dat <- # Grundsätzliche Erstellung des idF verwendeten Datensatzes
    ebt_mds_grpd(period = "day", grp_nm = "Date") |>
      select(Date, Count, Hits, HitRt) |>
      mutate(across(c(Count, Hits), ~cumsum(.), .names = "c{.col}"), # Kumulieren von Count und Hits
-            !!vnm := (cCount - lag(head(c(0, cCount), -1), lag-1)) / (cHits - lag(head(c(0, cHits), -1), lag-1)), # last x Days Hit Ratio
+            !!vnm := c(rep(NA, lag), diff(cCount, lag) / diff(cHits, lag)), # last x Days Hit Ratio
             cHitRt = cCount / cHits,
             smlr = rank(cHitRt, ties.method = "first") - 1, # Anzahl Tage mit niedrigerer cHitRt
             across(c(!!vnm, cHitRt), ~num(., digits = digi_lon), .names = "{.col}Long"), # Langversionenen der Hit Ratios (Nachkommastellen hier regelbar)
