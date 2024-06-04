@@ -1,12 +1,12 @@
 library(tidyverse)
 
-x <- c(Cnt = 1, Val = 20, Hts = 1/100) * 25e3
+divisor <- c(Cnt = 1, Val = 20, Hts = 1/100) * 25e3
 
 he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
   select(Date, Cnt = Count, Val = Value, Hts = Hits) %>%
-  mutate(L_Cnt = cumsum(Cnt) %/% x["Cnt"],
-         L_Val = cumsum(Val) %/% x["Val"],
-         L_Hts = cumsum(Hts) %/% x["Hts"]) %>%
+  mutate(L_Cnt = cumsum(Cnt) %/% divisor["Cnt"],
+         L_Val = cumsum(Val) %/% divisor["Val"],
+         L_Hts = cumsum(Hts) %/% divisor["Hts"]) %>%
   mutate(across(.cols = starts_with("L_"), .fns = ~ (c(0, diff(.))) == 1)) %>%
   filter(L_Hts | L_Cnt | L_Val) %>% 
   add_row(Date = lubridate::ymd("2004-8-3"), L_Cnt = TRUE, L_Val = TRUE, L_Hts = TRUE, .before = 1)
@@ -14,7 +14,8 @@ he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
 bind_rows(he %>% filter(L_Cnt) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Cnt"),
           he %>% filter(L_Val) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Val"),
           he %>% filter(L_Hts) %>% pull(Date) %>% as.numeric() %>% diff() %>% tibble(DDiff = ., Cat = "Hts")) %>% 
-  mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"), labels = c(paste0(x[1] / 1e3, "k Bills"), paste0(x[2] / 1e3, "k Euro"), paste0(x[3], " Hits")))) %>% 
+  mutate(Cat = factor(Cat, levels = c("Cnt", "Val", "Hts"),
+                      labels = c(paste0(divisor["Cnt"] / 1e3, "k Bills"), paste0(divisor["Val"] / 1e3, "k Euro"), paste0(divisor["Hts"], " Hits")))) %>% 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
   geom_boxplot(mapping = aes(y = 1), width = .75, color = "white", fill = "white", size = 2, alpha = .75) +
@@ -31,4 +32,4 @@ bind_rows(he %>% filter(L_Cnt) %>% pull(Date) %>% as.numeric() %>% diff() %>% ti
 
 windows(16, 9)
 plot(p)
-rm(x, he, p)
+rm(divisor, he, p)
