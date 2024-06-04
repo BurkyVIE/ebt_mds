@@ -26,16 +26,15 @@
 
 library(tidyverse)
 
-x <- 25e3
-x <- x * c(1, 30, 1/100)
+x <- c(Cnt = 1, Val = 20, Hts = 1/100) * 25e3
 
 he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
-  select(Date, Count, Value, Hits) %>%
-  mutate(across(.cols = Count:Hits, .fns = ~ cumsum(.))) %>%
-  mutate(D_Cnt = Count %/% x[1],
-         D_Val = Value %/% x[2],
-         D_Hts = Hits %/% x[3]) %>%
-  mutate(across(.cols = starts_with("D_"), .fns = ~ . - lag(., 1))) %>%
+  select(Date, Cnt = Count, Val = Value, Hts = Hits) %>%
+  mutate(across(.cols = Cnt:Hts, .fns = ~ cumsum(.))) %>%
+  mutate(D_Cnt = Cnt %/% x["Cnt"],
+         D_Val = Val %/% x["Val"],
+         D_Hts = Hts %/% x["Hts"]) %>%
+  mutate(across(.cols = starts_with("D_"), .fns = ~ c(0, diff(.)))) %>%
   filter(D_Hts == 1 | D_Cnt == 1 | D_Val == 1) %>% 
   add_row(Date = lubridate::ymd("2004-8-3"), D_Cnt = 1, D_Val = 1, D_Hts = 1, .before = 1)
 
