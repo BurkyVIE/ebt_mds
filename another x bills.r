@@ -4,9 +4,10 @@ divisor <- c(Cnt = 1, Val = 20, Hts = 1/100) * 25e3
 
 he <- ebt_mds_grpd(per = "day", grp_nm = "Date") %>%
   select(Date, Cnt = Count, Val = Value, Hts = Hits) %>%
-  mutate(L_Cnt = cumsum(Cnt) %/% divisor["Cnt"],
-         L_Val = cumsum(Val) %/% divisor["Val"],
-         L_Hts = cumsum(Hts) %/% divisor["Hts"]) %>%
+  mutate(across(.cols = Cnt:Hts, .fns = ~ cumsum(.), .names = "C_{.col}")) %>%
+  mutate(L_Cnt = C_Cnt %/% divisor["Cnt"],
+         L_Val = C_Val %/% divisor["Val"],
+         L_Hts = C_Hts %/% divisor["Hts"]) %>%
   mutate(across(.cols = starts_with("L_"), .fns = ~ (c(0, diff(.))) == 1)) %>%
   filter(L_Hts | L_Cnt | L_Val) %>% 
   add_row(Date = lubridate::ymd("2004-8-3"), L_Cnt = TRUE, L_Val = TRUE, L_Hts = TRUE, .before = 1)
