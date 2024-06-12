@@ -14,7 +14,6 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   
   ## Evaluation der Gruppe/des Gruppennamens ----
   grouping = sym(grp_nm)
-  grouping_nm = as_label(grouping)
   
   ## Erstelle vollständige Liste der möglichen Daten (= Datümer) ----
   tmp <- c(today(tzone = "CET"),         # bis inkl heute ... --- CET weil in Arbeit keine std-tz gesetzt
@@ -48,12 +47,12 @@ ebt_mds_grpd <- function(mds_data = ebt_mds, ytd = FALSE, ytd_dm = NULL, period 
   ## Spezialfälle ----
   if(period %in% c("day", "weekday", "overall")) {
     tmp <- switch(period,
-                  day = rename(.data = tmp, !!grouping_nm := Date),
-                  weekday = mutate(.data = tmp, !!grouping_nm := wday(x = Date, week_start = 1, label = TRUE) |> 
+                  day = rename(.data = tmp, "{grp_nm}" := Date),
+                  weekday = mutate(.data = tmp, "{grp_nm}" := wday(x = Date, week_start = 1, label = TRUE) |> 
                                      ordered(labels = date_names_lang("en")$day[c(2:7, 1)])),
-                  overall = mutate(.data = tmp, !!grouping_nm := "overall"))
+                  overall = mutate(.data = tmp, "{grp_nm}" := "overall"))
     } else
-    tmp <- tmp %>% mutate(!!grouping_nm := floor_date(Date, unit = period, week_start = 1))
+    tmp <- tmp %>% mutate("{grp_nm}" := floor_date(Date, unit = period, week_start = 1))
   
   ## Zusammenfassen entsprechend Periode ----
   tmp <- group_by(.data = tmp, !!grouping) |>
