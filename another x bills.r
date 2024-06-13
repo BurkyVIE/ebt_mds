@@ -16,9 +16,9 @@ select(he, Date, ends_with("ns")) |>
   filter(filter) |>
   mutate(DDiff = c(NA, diff(Date)), .by = Cat, .keep = "used") |> 
   mutate(Cat = factor(str_replace(Cat, ".*_(.*)_.*", "\\1"), levels = names(divisor),
-                      labels = c(paste0(divisor["Count"] / 1e3, "k Bills"),
-                                 paste0(divisor["Value"] / 1e3, "k Euro"),
-                                 paste0(divisor["Hits"], " Hits")))) |> 
+                      labels = c(paste0(divisor[1] / 1e3, "k Bills"),
+                                 paste0(divisor[2] / 1e3, "k Euro"),
+                                 paste0(divisor[3], " Hits")))) |> 
   filter(!is.na(DDiff)) |> 
   ggplot(mapping = aes(x = DDiff, fill = Cat)) +
   geom_histogram(binwidth = 30, color = "white", show.legend = FALSE) +
