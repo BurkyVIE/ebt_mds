@@ -25,7 +25,7 @@ streak <- function(x, a, b){
 ## Erstelle Daten mittels Funktion ----
 ebt_mds_full <-
   ebt_mds_grpd(per = "day", grp_nm = "Date") %>% 
-  select(!c(Days, EntRt, LocRt, ERPctl, LRPctl)) %>% # Hier days immer 1, daher weg mit Ableitungen und entsprechenden ecdf
+  select(!c(Days, EntRt, LocRt)) %>% # Hier days immer 1, daher weg mit Ableitungen
   mutate(Day = lubridate::wday(x = Date, week_start = 1, label = TRUE) %>% ordered(labels = date_names_lang("en")$day_ab[c(2:7, 1)]), .after = Loc) # Immer englische Abkürzungen für die Wochentage verwenden [wday() nimmt aus locale()]
 
 ## Ergänzen der Streaks ----
